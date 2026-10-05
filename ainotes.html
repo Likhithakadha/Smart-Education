@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q-Learn AI - AI Notes Module</title>
+    <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-950 text-white font-sans h-screen flex overflow-hidden">
+
+    <!-- LEFT SIDEBAR: Algorithm List -->
+    <div class="w-1/3 bg-gray-900 border-r border-gray-800 p-6 flex flex-col h-full">
+        <h2 class="text-2xl font-bold mb-2 text-cyan-400">🤖 AI Quantum Notes</h2>
+        <p class="text-sm text-gray-400 mb-6">Select an algorithm to view simplified notes:</p>
+        
+        <div id="algoList" class="space-y-3 overflow-y-auto flex-1 pr-2">
+            <!-- Buttons will be injected here via JavaScript -->
+        </div>
+    </div>
+
+    <!-- RIGHT CONTENT AREA: Dynamic Notes & Visualizer -->
+    <div class="w-2/3 p-10 overflow-y-auto flex flex-col justify-start bg-gray-950">
+        <div id="contentArea" class="bg-gray-900 border border-gray-800 p-8 rounded-2xl shadow-2xl">
+            <!-- Dynamic Content will be injected here via JavaScript -->
+        </div>
+    </div>
+
+    <!-- JavaScript for Interactivity -->
+    <script>
+        const quantumAlgorithms = [
+            {
+                id: 'shor',
+                name: "Shor's Algorithm",
+                tagline: "The Prime Factorization Wizard",
+                points: [
+                    "Invented by mathematician Peter Shor in the year 1994.",
+                    "Designed to find the prime factors of a composite integer exponentially fast.",
+                    "Performs mathematical operations using the principles of quantum mechanics.",
+                    "Leverages Quantum Superposition to evaluate multiple values simultaneously.",
+                    "Uses Quantum Period Finding to discover hidden repeating patterns in sequences.",
+                    "Integrates the Quantum Fourier Transform (QFT) as its core computational engine.",
+                    "Poses a major security threat to modern internet security infrastructures.",
+                    "Can break standard RSA public-key encryption schemes in a matter of seconds.",
+                    "Requires significantly fewer computing steps compared to trial-division methods.",
+                    "Demands error-corrected quantum computers with high physical qubit counts.",
+                    "Paved the way for the entire field of Post-Quantum Cryptography (PQC).",
+                    "Acts as one of the definitive proofs of practical quantum computing power."
+                ],
+                steps: [
+                    "<strong>Step 1:</strong> Choose a random number <em>a</em> less than the target composite number <em>N</em>.",
+                    "<strong>Step 2:</strong> Use a quantum computer to find the repeating period (<em>r</em>) of the modular exponentiation function.",
+                    "<strong>Step 3:</strong> Apply the Quantum Fourier Transform (QFT) to extract and measure this period <em>r</em> accurately.",
+                    "<strong>Step 4:</strong> Pass the measured period into classical Euclidean math to instantly output the prime factors of <em>N</em>."
+                ],
+                exampleTitle: "Detailed Example: Factoring the Number 15",
+                examplePoints: [
+                    "Let's take a composite number <strong>N = 15</strong>, whose prime factors we want to find (obviously 3 and 5).",
+                    "On a traditional classical computer, finding factors of very large numbers requires dividing by every number one by one, which takes millions of years for huge keys.",
+                    "Shor's algorithm takes a completely different approach by converting the prime factorization problem into a <strong>mathematical period-finding wave problem</strong>.",
+                    "It selects a random number (say, <em>a = 7</em>) and builds a modular exponential sequence: $7^x \\pmod{15}$.",
+                    "The sequence of remainders repeats in a cycle: 7, 4, 13, 1, 7, 4, 13, 1... showing a clear repeating period of <strong>r = 4</strong>.",
+                    "Using Quantum Superposition, a quantum computer evaluates all these cyclical states in parallel instead of sequentially.",
+                    "The Quantum Fourier Transform (QFT) is then applied to cleanly extract and measure this hidden period <em>r = 4</em>.",
+                    "Finally, a normal classical computer uses basic greatest common divisor (GCD) math: $\\text{GCD}(7^{4/2} \\pm 1, 15)$.",
+                    "This instantly yields <strong>3 and 5</strong> in a single quantum run, proving how efficiently it bypasses standard trial divisions."
+                ],
+                circuitExplanation: [
+                    "<strong>Qubits Layout:</strong> Uses two sets of qubits—one control register for period finding and one target register for modular arithmetic.",
+                    "<strong>Modular Exponentiation Box ($U^x$):</strong> Performs parallel calculations of powers modulo N using quantum gates.",
+                    "<strong>QFT Block:</strong> Acts at the end of the circuit to decode phase information into measurable frequency spikes."
+                ],
+                circuitText: `
+                    |0⟩ ──[H]──■──[QFT†]──(M)──
+                    |0⟩ ──[H]──│──[QFT†]──(M)──
+                    |1⟩ ──────[U^x]──────────
+                `,
+                circuitFlow: "Superposition (H) ➔ Modular Exponentiation (U^x) ➔ Quantum Fourier Transform (QFT†) ➔ Measurement (M)"
+            },
+            {
+                id: 'grover',
+                name: "Grover's Algorithm",
+                tagline: "The Database Search Optimizer",
+                points: [
+                    "Developed by computer scientist Lov Grover in 1996.",
+                    "Solves unstructured database search problems with quadratic acceleration.",
+                    "Searches through unsorted data items much faster than any classical counterpart.",
+                    "Reduces linear search time complexity from O(N) down to square-root time O(√N).",
+                    "Utilizes Quantum Superposition to hold all database entries in a single state.",
+                    "Employs a Quantum Oracle to identify and mark the target search item.",
+                    "Uses Amplitude Amplification to boost the probability of the correct solution.",
+                    "Repeats diffusion steps precisely to maximize measurement accuracy.",
+                    "Helps in cracking symmetric encryption keys and password hashing systems.",
+                    "Widely used in combinatorial optimization and spatial routing problems.",
+                    "Operates efficiently on early-stage and intermediate quantum processors.",
+                    "Significantly cuts down execution time for brute-force searching tasks."
+                ],
+                steps: [
+                    "<strong>Step 1:</strong> Prepare all database items into a uniform Quantum Superposition state.",
+                    "<strong>Step 2:</strong> Apply the Quantum Oracle to flip the phase (negative sign) of the target item.",
+                    "<strong>Step 3:</strong> Use the Diffusion Operator (Amplitude Amplification) to boost the target's probability.",
+                    "<strong>Step 4:</strong> Measure the final state to retrieve the correct database item with high success probability."
+                ],
+                exampleTitle: "Detailed Example: Searching 1 Million Unsorted Contacts",
+                examplePoints: [
+                    "Imagine you have a phone directory containing exactly <strong>1,000,000 names</strong>, but they are completely shuffled and unsorted.",
+                    "You are tasked with finding one specific target name hidden inside this massive database.",
+                    "A classical computer using linear search has to inspect entries one after another, taking an average of <strong>500,000 checks</strong> and up to 1,000,000 checks in the worst-case scenario.",
+                    "Grover's algorithm transforms this lookup process using quantum mechanics by putting all 1 million names into a simultaneous superposition state.",
+                    "A quantum Oracle marks the correct name by flipping its phase, while a diffusion operator amplifies its probability signal.",
+                    "Instead of checking half a million times, Grover's algorithm finds the exact contact in roughly the square root of N steps.",
+                    "The calculation $\\sqrt{1,000,000}$ equals just <strong>1,000 steps</strong>.",
+                    "This dramatic drop from 500,000 checks down to 1,000 checks illustrates the incredible power of quadratic quantum speedup."
+                ],
+                circuitExplanation: [
+                    "<strong>Hadamard Gates ($H$):</strong> Placed at the very beginning to put all qubits into an equal superposition state.",
+                    "<strong>The Oracle ($U_w$):</strong> A custom logic block that flips the phase of the winning target state.",
+                    "<strong>Diffusion Operator ($U_s$):</strong> Amplifies the amplitude of the marked target so it stands out tall during final measurement."
+                ],
+                circuitText: `
+                    |0⟩ ──[H]──[ Oracle (Uw) ]──[ Diffusion (Us) ]──(M)──
+                    |0⟩ ──[H]──[ Oracle (Uw) ]──[ Diffusion (Us) ]──(M)──
+                `,
+                circuitFlow: "Hadamard (H) ➔ Quantum Oracle (Uw) ➔ Diffusion Operator (Us) ➔ Measurement (M)"
+            },
+            {
+                id: 'qft',
+                name: "Quantum Fourier Transform (QFT)",
+                tagline: "The Frequency Analyzer",
+                points: [
+                    "Serves as the quantum mechanical equivalent of the classical Fast Fourier Transform.",
+                    "Transforms quantum states between the computational domain and frequency domain.",
+                    "Executes frequency analysis using polynomial time complexity steps.",
+                    "Acts as a vital foundational backend building block for advanced algorithms.",
+                    "Crucial component for executing Shor's prime factorization algorithm successfully.",
+                    "Employs a precise sequence of Hadamard gates on individual qubits.",
+                    "Applies controlled phase-shift gates ($R_k$) to entangle qubit phases.",
+                    "Manipulates quantum phases to cause constructive and destructive interference.",
+                    "Extracts hidden periodic patterns from complex wave functions effortlessly.",
+                    "Operates with exponential efficiency compared to classical discrete transforms.",
+                    "Essential for precision measurements in quantum simulation models.",
+                    "Forms the mathematical backbone of numerous quantum signal-processing tools."
+                ],
+                steps: [
+                    "<strong>Step 1:</strong> Take the input quantum state in the standard computational basis.",
+                    "<strong>Step 2:</strong> Apply a sequence of Hadamard gates combined with controlled phase-shift ($R_k$) gates.",
+                    "<strong>Step 3:</strong> Rotate qubit phases systematically to encode frequency and periodicity details.",
+                    "<strong>Step 4:</strong> Output the transformed state into the frequency/phase domain for downstream usage."
+                ],
+                exampleTitle: "Detailed Example: Decoding Complex Musical Frequencies",
+                examplePoints: [
+                    "Think of how an app like Shazam identifies an unknown song playing in a noisy environment by analyzing sound wave frequencies.",
+                    "In quantum computing, input data is often stored as a massive wave function containing overlapping frequencies and states.",
+                    "A classical Fast Fourier Transform (FFT) takes $O(N \\log N)$ steps to analyze these complex signals, which becomes slow for massive dimensions.",
+                    "QFT steps in to perform this exact translation into the frequency domain in just $O((\\log N)^2)$ steps.",
+                    "It uses a clever arrangement of Hadamard and controlled phase-shift gates ($R_k$) to shift qubit phases.",
+                    "Through constructive and destructive wave interference, incorrect frequencies cancel out to zero.",
+                    "Only the true underlying periodic frequencies remain highlighted, making hidden patterns instantly readable for quantum systems."
+                ],
+                circuitExplanation: [
+                    "<strong>Hadamard Gate ($H$):</strong> Creates superposition on individual lines sequentially.",
+                    "<strong>Controlled Phase Gates ($R_2, R_3, \dots$):</strong> Introduces specific rotational phase dependencies between qubits.",
+                    "<strong>SWAP Gates:</strong> At the end of the circuit, qubits are re-ordered into their correct sequential position."
+                ],
+                circuitText: `
+                    q0: ──[H]──•───────[SWAP]──
+                    q1: ──────(R2)───[SWAP]──
+                    q2: ──────────(R3)──[SWAP]──
+                `,
+                circuitFlow: "Hadamard (H) ➔ Controlled Phase-Shift (R_k) ➔ SWAP Rearrangement"
+            },
+            {
+                id: 'qpe',
+                name: "Quantum Phase Estimation (QPE)",
+                tagline: "The Eigenvalue Detector",
+                points: [
+                    "Designed to estimate the phase (eigenvalue) of a unitary operator with high precision.",
+                    "Operates using a dual-register architecture consisting of control and target qubits.",
+                    "Prepares control registers in uniform superposition using standard Hadamard gates.",
+                    "Applies controlled unitary operations ($C-U$) raised to powers of two.",
+                    "Integrates the Inverse Quantum Fourier Transform (IQFT) near the final stage.",
+                    "Translates phase information from frequency domain back into readable binary digits.",
+                    "Serves as a primary computational subroutine in complex quantum algorithms.",
+                    "Critically important for executing the period-finding routine in Shor's algorithm.",
+                    "Enables accurate calculation of molecular energy levels in physical simulations.",
+                    "Powers advanced quantum chemistry and quantum mechanical material analysis.",
+                    "Provides exponential precision advantages over classical phase-finding techniques.",
+                    "Demands high coherence times and low error rates from hardware setups."
+                ],
+                steps: [
+                    "<strong>Step 1:</strong> Initialize control and target registers, setting control qubits into superposition.",
+                    "<strong>Step 2:</strong> Apply controlled unitary operations ($C-U$) matching powers of two ($U^1, U^2, U^4$).",
+                    "<strong>Step 3:</strong> Perform the Inverse Quantum Fourier Transform (IQFT) on the control register.",
+                    "<strong>Step 4:</strong> Measure the control qubits to output the precise binary phase value."
+                ],
+                exampleTitle: "Detailed Example: Measuring Quantum Rotation Angles",
+                examplePoints: [
+                    "Imagine a quantum gate operation that rotates a target qubit state by an unknown angle or phase $\\theta$.",
+                    "Finding this exact angle precisely using classical measurement tools is extremely difficult because measuring a qubit directly destroys its quantum superposition state.",
+                    "QPE solves this challenge by employing a dual register system: a control register and a target eigenstate register.",
+                    "It applies controlled-U operations raised to successive powers of two ($U^1, U^2, U^4$, etc.) to accumulate phase details.",
+                    "An Inverse Quantum Fourier Transform (IQFT) is then run on the control register to decode this accumulated phase.",
+                    "When the control qubits are finally measured, they reveal the exact binary digits of the phase angle $\\theta$ with high accuracy.",
+                    "This precise phase detection acts as the core calculation engine inside Shor's algorithm and molecular chemistry simulators."
+                ],
+                circuitExplanation: [
+                    "<strong>Control & Target Qubits:</strong> Top lines hold control states in superposition; bottom lines hold target eigenvectors.",
+                    "<strong>Controlled-$U^{2^k}$ Operations:</strong> Applies repeated unitary transformations proportional to binary powers.",
+                    "<strong>Inverse QFT ($QFT^\dagger$):</strong> Reverses the frequency transform to retrieve clean phase digits."
+                ],
+                circuitText: `
+                    q0: ──[H]─────•───────[IQFT]──(M)──
+                    q1: ──[H]─────│──•───[IQFT]──(M)──
+                    |ψ⟩: ────────[U^1][U^2]──────────
+                `,
+                circuitFlow: "Superposition (H) ➔ Controlled-U Powers (U^(2^k)) ➔ Inverse QFT ➔ Measurement"
+            },
+            {
+                id: 'deutsch',
+                name: "Deutsch-Jozsa Algorithm",
+                tagline: "The Quantum Advantage Pioneer",
+                points: [
+                    "Formally introduced to demonstrate the concept of quantum computational advantage.",
+                    "Analyzes a black-box function to determine if it is Constant or Balanced.",
+                    "Assumes a constant function always outputs the exact same value for all inputs.",
+                    "Assumes a balanced function outputs 0 for half inputs and 1 for the other half.",
+                    "Classical computers require multiple queries to check input combinations exhaustively.",
+                    "Evaluates and solves the problem using only a single query in quantum mode.",
+                    "Leverages full quantum parallelism to process multiple states at once.",
+                    "Applies initial layers of Hadamard gates to create total system superposition.",
+                    "Utilizes a quantum oracle to encode function outputs into relative phases.",
+                    "Employs a secondary layer of Hadamard gates to induce wave interference.",
+                    "Measures final output states to determine mathematical properties instantly.",
+                    "Stands historically as the first clear proof of quantum superiority."
+                ],
+                steps: [
+                    "<strong>Step 1:</strong> Apply Hadamard gates to put input and output registers into complete superposition.",
+                    "<strong>Step 2:</strong> Pass the superposition through the Quantum Oracle function once.",
+                    "<strong>Step 3:</strong> Apply the second layer of Hadamard gates to cause constructive/destructive interference.",
+                    "<strong>Step 4:</strong> Measure output: all zeros indicate a Constant function, any other pattern indicates Balanced."
+                ],
+                exampleTitle: "Detailed Example: The Hidden Coin-Toss Function",
+                examplePoints: [
+                    "Imagine a mysterious black box containing a hidden mechanism that takes numbers as input and outputs either 0 or 1.",
+                    "You are given a guarantee: the function inside is either <strong>Constant</strong> (always outputs 0, or always outputs 1 no matter what you input) or <strong>Balanced</strong> (outputs 0 for exactly half of the inputs and 1 for the other half).",
+                    "On a classical computer, if you have a massive input space, you would have to test more than half of all possible inputs to be completely sure whether it's constant or balanced.",
+                    "The Deutsch-Jozsa algorithm uses quantum superposition to feed all possible inputs into the black-box function simultaneously.",
+                    "Through a single execution pass (just <strong>1 query</strong>) and a final layer of Hadamard interference gates, the qubits interact.",
+                    "If the final measurement results in all zeros ($|000\\rangle$), it proves the function is Constant.",
+                    "If any other pattern appears, it guarantees the function is Balanced, demonstrating definitive quantum advantage."
+                ],
+                circuitExplanation: [
+                    "<strong>Initial Hadamards:</strong> Prepares both input and ancillary output qubits into superposition.",
+                    "<strong>The Oracle Box ($U_f$):</strong> Evaluates the boolean function logic in one unified shot.",
+                    "<strong>Final Hadamards:</strong> Triggers wave interference so that constant states amplify and balanced states cancel out."
+                ],
+                circuitText: `
+                    q0: ──[H]──[ Oracle (Uf) ]──[H]──(M)──
+                    q1: ──[H]──[ Oracle (Uf) ]──[H]──(M)──
+                    |1⟩: ──[H]──────────────────────────
+                `,
+                circuitFlow: "Hadamard (H) ➔ Quantum Oracle (Uf) ➔ Hadamard (H) ➔ Measurement"
+            },
+            {
+                id: 'vqe',
+                name: "Variational Quantum Eigensolver (VQE)",
+                tagline: "The Chemistry Solver for NISQ Era",
+                points: [
+                    "Operates as a hybrid quantum-classical collaborative algorithm.",
+                    "Specifically built to function on current Noisy Intermediate-Scale Quantum hardware.",
+                    "Divides computation tasks between quantum processors and classical optimizers.",
+                    "Uses quantum circuits to prepare parameterized quantum states called Ansatz.",
+                    "Measures expectation values and molecular energy states efficiently on hardware.",
+                    "Sends measurement metrics to a classical computer for parameter adjustments.",
+                    "Runs continuous optimization loops to minimize overall system energy.",
+                    "Successfully targets and finds the ground state energy of complex molecules.",
+                    "Plays a revolutionary role in modern pharmaceutical drug discovery.",
+                    "Aids materials science in designing advanced catalysts and chemical compounds.",
+                    "Bypasses the need for large-scale error-corrected qubits immediately.",
+                    "Represents the most practical real-world application of near-term quantum tech."
+                ],
+                steps: [
+                    "<strong>Step 1:</strong> Prepare a trial quantum state (Ansatz) with adjustable parameters.",
+                    "<strong>Step 2:</strong> Use the quantum processor to measure the energy expectancy of the state.",
+                    "<strong>Step 3:</strong> Send the energy metric to a classical optimizer to tweak parameters.",
+                    "<strong>Step 4:</strong> Repeat the loop iteratively until the lowest ground-state energy is found."
+                ],
+                exampleTitle: "Detailed Example: Simulating a Hydrogen Molecule ($H_2$)",
+                examplePoints: [
+                    "In pharmaceutical drug design and material science, researchers need to calculate the precise binding energy of molecules to understand chemical reactions.",
+                    "Calculating complex molecular bond structures completely on a classical supercomputer takes excessive computation time.",
+                    "Current quantum computers are in the NISQ era, meaning they have limited qubits and are prone to hardware noise errors, making full algorithms like Shor's impractical right now.",
+                    "VQE solves this by acting as a <strong>hybrid team player</strong> between quantum and classical systems.",
+                    "The quantum computer prepares a trial molecular state (called an *Ansatz*) using adjustable angle parameters and measures its energy.",
+                    "This raw energy value is sent to a classical computer optimizer, which tweaks the parameters to try and find a lower energy state.",
+                    "This loop repeats continuously until the system settles at the lowest possible energy state, known as the <strong>ground state energy</strong>, giving scientists the stable molecular structure instantly."
+                ],
+                circuitExplanation: [
+                    "<strong>Parameterized Ansatz Circuit:</strong> Uses rotation gates ($R_x, R_y, R_z$) and CNOTs controlled by variable parameters ($\theta$).",
+                    "<strong>Measurement Module:</strong> Evaluates Pauli expectation values across the qubits.",
+                    "<strong>Classical Optimizer Loop:</strong> Takes measured output data off-chip to iteratively adjust rotation angles."
+                ],
+                circuitText: `
+                    q0: ──[Rx(θ1)]──[CNOT]──(Measure)──┐
+                    q1: ──[Ry(θ2)]──[ ● ]───(Measure)──┼─ [ Classical Optimizer ]
+                                                         │         │
+                       ◄─────────────────────────────────┘         └──────┘
+                `,
+                circuitFlow: "Parameterized Ansatz State ➔ Quantum Energy Measurement ➔ Classical Optimizer Feedback Loop"
+            }
+        ];
+
+        let selectedId = quantumAlgorithms[0].id;
+
+        function renderApp() {
+            const listContainer = document.getElementById('algoList');
+            const contentContainer = document.getElementById('contentArea');
+
+            // Render Sidebar Buttons
+            listContainer.innerHTML = quantumAlgorithms.map(algo => {
+                const isSelected = algo.id === selectedId;
+                return `
+                    <button onclick="selectAlgo('${algo.id}')" 
+                        class="w-full text-left p-4 rounded-xl transition-all duration-300 flex items-center justify-between ${
+                            isSelected 
+                                ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30 font-semibold border border-cyan-400' 
+                                : 'bg-gray-800/60 text-gray-300 hover:bg-gray-800 hover:text-white'
+                        }">
+                        <div>
+                            <div class="font-bold">${algo.name}</div>
+                            <div class="text-xs opacity-75">${algo.tagline}</div>
+                        </div>
+                        <span class="text-xs px-2 py-1 bg-black/30 rounded-md h-fit">View</span>
+                    </button>
+                `;
+            }).join('');
+
+            // Find Selected Algorithm Data
+            const currentAlgo = quantumAlgorithms.find(a => a.id === selectedId);
+
+            // Render Right Content Area
+            contentContainer.innerHTML = `
+                <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
+                    ${currentAlgo.name}
+                </h1>
+                <p class="text-cyan-300 text-sm font-medium mb-4">✨ ${currentAlgo.tagline}</p>
+                
+                <div class="border-b border-gray-800 pb-3 mb-5">
+                    <span class="text-xs uppercase tracking-wider bg-cyan-950 text-cyan-400 px-3 py-1 rounded-full border border-cyan-800">
+                        AI Explained Notes
+                    </span>
+                </div>
+
+                <!-- 1. Description (Normal Bullet Points) -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-3">Description:</h3>
+                    <ul class="space-y-2 pl-2">
+                        ${currentAlgo.points.map(pt => `<li class="text-gray-300 text-sm leading-relaxed flex items-start gap-2"><span class="text-cyan-400 mt-1">🔹</span> <span>${pt}</span></li>`).join('')}
+                    </ul>
+                </div>
+
+                <!-- 2. Step-by-Step Explanation -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-3">Step-by-Step Working:</h3>
+                    <div class="space-y-3 bg-cyan-950/20 p-5 rounded-xl border border-cyan-900/50">
+                        ${currentAlgo.steps.map(step => `<div class="text-gray-300 text-sm leading-relaxed flex items-start gap-2"><span>⚡</span> <span>${step}</span></div>`).join('')}
+                    </div>
+                </div>
+
+                <!-- 3. Example & Detailed Explanation -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-3">💡 Example & Detailed Explanation:</h3>
+                    <div class="bg-blue-950/30 p-5 rounded-xl border border-blue-900/50">
+                        <h4 class="text-cyan-400 font-semibold text-sm mb-3">${currentAlgo.exampleTitle}</h4>
+                        <ul class="space-y-3">
+                            ${currentAlgo.examplePoints.map(ep => `<li class="text-gray-300 text-sm leading-relaxed flex items-start gap-2"><span class="text-blue-400 mt-1">📌</span> <span>${ep}</span></li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 4. Circuit Explanation -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-3">🔬 Circuit Breakdown & Explanation:</h3>
+                    <div class="space-y-3 bg-purple-950/20 p-5 rounded-xl border border-purple-900/50">
+                        ${currentAlgo.circuitExplanation.map(cex => `<div class="text-gray-300 text-sm leading-relaxed flex items-start gap-2"><span>📐</span> <span>${cex}</span></div>`).join('')}
+                    </div>
+                </div>
+
+                <!-- 5. Quantum Circuit Text/Code Format Diagram -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-200 mb-3">Quantum Circuit Diagram (Text Format):</h3>
+                    <div class="rounded-xl overflow-x-auto border border-gray-800 bg-gray-900 p-5 shadow-lg font-mono text-xs text-cyan-300 leading-relaxed">
+                        <pre class="whitespace-pre">${currentAlgo.circuitText.trim()}</pre>
+                        <div class="mt-4 pt-3 border-t border-gray-800 text-gray-400 text-xs">
+                            <span class="text-yellow-400 font-bold">Execution Flow:</span> ${currentAlgo.circuitFlow}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectAlgo(id) {
+            selectedId = id;
+            renderApp();
+        }
+
+        // Initial Render
+        renderApp();
+    </script>
+</body>
+</html>

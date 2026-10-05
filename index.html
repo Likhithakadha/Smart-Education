@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page with Background Video</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            color: #ffffff;
+        }
+
+        /* Background Video Wrapper */
+        .video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .bg-video {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+        }
+
+        /* Dark overlay to make content readable over the video */
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Adjust opacity as needed */
+        }
+
+        /* Hero Section Content */
+        .hero-section {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 10%;
+        }
+
+        .content-box {
+            max-width: 600px;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #cccccc;
+            line-height: 1.6;
+        }
+
+        /* Glassmorphism Button */
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="video-container">
+        <video autoplay muted loop playsinline class="bg-video">
+            <source src="landing.mp4.mp4" type="video/mp4">
+            Your browser does not support HTML5 video.
+        </video>
+        <div class="video-overlay"></div>
+    </div>
+
+    <main class="hero-section">
+        <div class="content-box">
+            <h1>AI BASED INTERACIVE QUANTAM LEARNING PLATFORM</h1>
+            <p>learn quantam computing through interaction and experimentation</p>
+            <a href="login.html" class="btn">Explore</a>
+        </div>
+    </main>
+
+</body>
+</html>

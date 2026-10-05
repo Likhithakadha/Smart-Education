@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumQuiz - Quantum Algorithms</title>
+    <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            padding: 30px 20px;
+        }
+
+        .quiz-container {
+            width: 100%;
+            max-width: 800px;
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 20px;
+        }
+
+        .header h2 {
+            color: #0284c7;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .question-card {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .question-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            color: #0f172a;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .option-label:hover {
+            border-color: #0284c7;
+        }
+
+        .option-label input {
+            cursor: pointer;
+        }
+
+        .ai-box {
+            margin-top: 15px;
+            padding: 12px 15px;
+            background-color: #f3e8ff;
+            border-left: 4px solid #9333ea;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #581c87;
+        }
+
+        .ai-box strong {
+            color: #7e22ce;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+
+        .submit-btn:hover {
+            background-color: #0369a1;
+        }
+
+        .results-summary {
+            text-align: center;
+            padding: 20px;
+            background-color: #e0f2fe;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border: 1px solid #7dd3fc;
+        }
+
+        /* Modal / Sliding Popup Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            animation: slideDown 0.3s ease;
+        }
+
+        .modal-content h3 {
+            color: #0284c7;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .modal-content p {
+            font-size: 14px;
+            color: #475569;
+            margin-bottom: 20px;
+        }
+
+        .modal-btn {
+            padding: 10px 25px;
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .modal-btn:hover {
+            background-color: #0369a1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container" id="app">
+        <!-- Content loaded dynamically via script -->
+    </div>
+
+    <!-- Modal Container for Sliding Popup -->
+    <div id="modal-slot"></div>
+
+    <script>
+        const quizQuestions = [
+            // --- SHOR'S ALGORITHM (Q1-4) ---
+            {
+                question: "1. What is the primary computational goal of Shor's Algorithm?",
+                options: [
+                    "Searching unsorted data linearly",
+                    "Finding prime factors of large composite numbers efficiently",
+                    "Evaluating Boolean constants",
+                    "Optimizing database sorting"
+                ],
+                answer: 1,
+                explanation: "Shor's algorithm solves prime factorization in polynomial time, posing a threat to standard RSA encryption."
+            },
+            {
+                question: "2. Prime factorization in Shor's algorithm is mathematically reduced to which problem?",
+                options: [
+                    "Order-finding (period finding of modular exponentiation)",
+                    "Discrete logarithm approximation",
+                    "Matrix eigenvalue estimation",
+                    "Traveling salesperson optimization"
+                ],
+                answer: 0,
+                explanation: "The algorithm converts the hard factoring problem into finding the period (order) of a function, which quantum computers handle using QFT."
+            },
+            {
+                question: "3. What is the time complexity class of Shor's algorithm on a quantum computer?",
+                options: [
+                    "Exponential time",
+                    "Polynomial time",
+                    "Constant time",
+                    "Factorial time"
+                ],
+                answer: 1,
+                explanation: "Shor's algorithm runs in polynomial time, drastically outperforming classical sub-exponential factoring methods."
+            },
+            {
+                question: "4. Why is Shor's algorithm considered revolutionary for cybersecurity?",
+                options: [
+                    "It secures Wi-Fi passwords forever",
+                    "It can break widespread public-key cryptography standards like RSA",
+                    "It speeds up everyday computer boot times",
+                    "It replaces firewall hardware"
+                ],
+                answer: 1,
+                explanation: "Its ability to quickly factor large numbers compromises widely deployed asymmetric encryption."
+            },
+
+            // --- GROVER'S ALGORITHM (Q5-8) ---
+            {
+                question: "5. What kind of speedup does Grover's Algorithm provide for searching an unstructured database of N items?",
+                options: [
+                    "Linear speedup O(N)",
+                    "Exponential speedup O(log N)",
+                    "Quadratic speedup O(sqrt(N))",
+                    "Constant speedup O(1)"
+                ],
+                answer: 2,
+                explanation: "Grover's algorithm provides a quadratic speedup, scaling with the square root of the dataset size."
+            },
+            {
+                question: "6. What core quantum subroutine is applied repeatedly in Grover's algorithm to find the target item?",
+                options: [
+                    "Quantum Phase Kickback",
+                    "Amplitude Amplification (Grover Iteration)",
+                    "Quantum Teleportation",
+                    "Quantum Error Correction"
+                ],
+                answer: 1,
+                explanation: "Amplitude amplification systematically raises the probability amplitude of the target state while lowering others."
+            },
+            {
+                question: "7. If an unstructured search space contains 10,000 items, approximately how many evaluations does Grover's algorithm require?",
+                options: [
+                    "10,000 items",
+                    "5,000 items",
+                    "100 items (square root)",
+                    "14 items"
+                ],
+                answer: 2,
+                explanation: "The square root of 10,000 is 100, which is the approximate number of iterations needed."
+            },
+            {
+                question: "8. Grover's algorithm can also be conceptualized as searching through what type of geometric space?",
+                options: [
+                    "A multi-dimensional hypersphere",
+                    "A two-dimensional plane spanned by initial state and target state",
+                    "A discrete grid matrix",
+                    "A linear vector line"
+                ],
+                answer: 1,
+                explanation: "Grover iteration can be geometrically visualized as a rotation in a two-dimensional vector space."
+            },
+
+            // --- QUANTUM FOURIER TRANSFORM (QFT) (Q9-11) ---
+            {
+                question: "9. What is the fundamental role of the Quantum Fourier Transform (QFT)?",
+                options: [
+                    "It measures qubit spin states instantly",
+                    "It converts computational basis states into frequency/phase representations",
+                    "It compresses data files",
+                    "It removes quantum thermal noise"
+                ],
+                answer: 1,
+                explanation: "QFT is the quantum analogue of the classical discrete Fourier transform and serves as a core engine in algorithms like Shor's."
+            },
+            {
+                question: "10. How does the gate complexity of QFT compare to the classical Fast Fourier Transform (FFT)?",
+                options: [
+                    "QFT uses exponentially fewer gates (O(n^2) vs O(n 2^n))",
+                    "QFT is much slower than FFT",
+                    "They have identical gate counts",
+                    "QFT cannot be structured into gates"
+                ],
+                answer: 0,
+                explanation: "QFT offers an exponential efficiency advantage in terms of operational steps compared to classical FFT."
+            },
+            {
+                question: "11. Which gates are fundamentally combined to build a standard QFT circuit?",
+                options: [
+                    "Pauli-X and CNOT gates",
+                    "Hadamard (H) gates and controlled phase-shift (R_k) gates",
+                    "Toffoli gates only",
+                    "Measurement operators exclusively"
+                ],
+                answer: 1,
+                explanation: "QFT relies heavily on Hadamard gates for superposition and controlled phase rotation gates for phase alignment."
+            },
+
+            // --- DEUTSCH-JOZSA ALGORITHM (Q12-15) ---
+            {
+                question: "12. What problem does the Deutsch-Jozsa Algorithm solve?",
+                options: [
+                    "Finding prime numbers",
+                    "Determining if a hidden boolean function is constant or balanced",
+                    "Sorting large numerical arrays",
+                    "Factoring cryptographic keys"
+                ],
+                answer: 1,
+                explanation: "It evaluates whether a given black-box function yields a constant output or a balanced output."
+            },
+            {
+                question: "13. In the Deutsch-Jozsa problem framework, what defines a 'balanced' function?",
+                options: [
+                    "It returns 0 for all inputs",
+                    "It returns 1 for all inputs",
+                    "It returns 0 for exactly half of the inputs and 1 for the other half",
+                    "It outputs random values every execution"
+                ],
+                answer: 2,
+                explanation: "A balanced function outputs 0 for 50% of domain values and 1 for the remaining 50%."
+            },
+            {
+                question: "14. How many oracle queries does the quantum Deutsch-Jozsa algorithm need to identify constant vs balanced functions with certainty?",
+                options: [
+                    "N queries",
+                    "N / 2 queries",
+                    "Exactly 1 query",
+                    "Log(N) queries"
+                ],
+                answer: 2,
+                explanation: "Unlike classical approaches requiring multiple tries, the quantum algorithm finds the answer in a single query using interference."
+            },
+            {
+                question: "15. Which core quantum phenomenon enables the Deutsch-Jozsa algorithm to succeed in a single query?",
+                options: [
+                    "Quantum entanglement only",
+                    "Quantum interference and phase kickback",
+                    "Thermal dissipation",
+                    "Wavefunction collapse control"
+                ],
+                answer: 1,
+                explanation: "Constructive and destructive interference cancel out incorrect states while amplifying the correct signature path."
+            }
+        ];
+
+        let userAnswers = {};
+        let isSubmitted = false;
+
+        function renderQuiz() {
+            const app = document.getElementById('app');
+            let html = `
+                <div class="header">
+                    <h2>QuantumQuiz</h2>
+                    <p>Test your knowledge on Quantum Algorithms (15 Questions)</p>
+                </div>
+            `;
+
+            if (isSubmitted) {
+                let score = 0;
+                quizQuestions.forEach((q, index) => {
+                    if (userAnswers[index] === q.answer) score++;
+                });
+
+                html += `
+                    <div class="results-summary">
+                        <h2 style="color: #0369a1; margin-bottom: 5px;">Quiz Completed! 🎉</h2>
+                        <p style="font-size: 18px; color: #0f172a;">Final Score: <strong>${score} / ${quizQuestions.length}</strong></p>
+                    </div>
+                `;
+            }
+
+            quizQuestions.forEach((q, qIndex) => {
+                const userSelected = userAnswers[qIndex];
+                const isCorrect = userSelected === q.answer;
+
+                let cardBorder = '#e2e8f0';
+                if (isSubmitted) {
+                    cardBorder = isCorrect ? '#10b981' : '#ef4444';
+                }
+
+                html += `
+                    <div class="question-card" style="border: 1px solid ${cardBorder};">
+                        <div class="question-title">${q.question}</div>
+                        <div class="options-list">
+                `;
+
+                q.options.forEach((opt, optIndex) => {
+                    const checked = userSelected === optIndex ? 'checked' : '';
+                    let optStyle = '';
+
+                    if (isSubmitted) {
+                        if (optIndex === q.answer) {
+                            optStyle = 'color: #047857; font-weight: bold; background: rgba(16,185,129,0.1); border-color: #10b981;';
+                        } else if (userSelected === optIndex && !isCorrect) {
+                            optStyle = 'color: #b91c1c; font-weight: bold; background: rgba(239,68,68,0.1); border-color: #ef4444;';
+                        }
+                    }
+
+                    html += `
+                        <label class="option-label" style="${optStyle}">
+                            <input type="radio" name="question_${qIndex}" value="${optIndex}" 
+                                onclick="selectOption(${qIndex}, ${optIndex})" ${checked} ${isSubmitted ? 'disabled' : ''}>
+                            <span>${opt}</span>
+                        </label>
+                    `;
+                });
+
+                html += `</div>`;
+
+                if (isSubmitted) {
+                    html += `
+                        <div class="ai-box">
+                            <strong>Explanation:</strong> ${q.explanation}
+                        </div>
+                    `;
+                }
+
+                html += `</div>`;
+            });
+
+            if (!isSubmitted) {
+                html += `<button class="submit-btn" onclick="triggerSubmitModal()">Submit Quiz</button>`;
+            } else {
+                html += `<button class="submit-btn" onclick="location.reload()" style="background-color: #64748b;">Retake Quiz</button>`;
+            }
+
+            app.innerHTML = html;
+        }
+
+        function selectOption(qIndex, optIndex) {
+            if (!isSubmitted) {
+                userAnswers[qIndex] = optIndex;
+            }
+        }
+
+        function triggerSubmitModal() {
+            if (Object.keys(userAnswers).length === 0) {
+                alert("Please answer at least one question before submitting!");
+                return;
+            }
+
+            // Show Sliding / Pop-up Modal
+            const modalSlot = document.getElementById('modal-slot');
+            modalSlot.innerHTML = `
+                <div class="modal-overlay">
+                    <div class="modal-content">
+                        <h3>Success!</h3>
+                        <p>Quiz Submitted Successfully! 🎉<br>Click OK to view your score and explanations.</p>
+                        <button class="modal-btn" onclick="closeModalAndShowResults()">OK</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function closeModalAndShowResults() {
+            // Clear modal
+            document.getElementById('modal-slot').innerHTML = '';
+            
+            // Mark as submitted and show results
+            isSubmitted = true;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            renderQuiz();
+        }
+
+        // Initial render
+        renderQuiz();
+    </script>
+</body>
+</html>

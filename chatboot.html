@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q-Learn AI - Quantum Algorithms Tutor</title>
+   
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+<body class="bg-gray-950 text-white font-sans h-screen flex flex-col overflow-hidden">
+
+   <!-- TOP HEADER -->
+    <header class="bg-gray-900 border-b border-gray-800 px-8 py-4 flex items-center justify-between shadow-md">
+        <div class="flex items-center space-x-3">
+            <div class="w-3.5 h-3.5 bg-cyan-400 rounded-full animate-ping"></div>
+            <h1 class="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+                ✨ Q-Learn AI - Quantum Algorithms Master
+            </h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <!-- BACK TO DASHBOARD BUTTON -->
+            <button onclick="window.location.href='dashboard.html'" class="text-xs bg-cyan-950 hover:bg-cyan-900 text-cyan-300 px-3 py-1.5 rounded-lg transition-all border border-cyan-800 flex items-center gap-1 font-medium">
+                🏠 Dashboard
+            </button>
+            <span class="text-xs bg-cyan-950 text-cyan-400 px-3 py-1 rounded-full border border-cyan-800">
+                Online & Ready 🚀
+            </span>
+            <button onclick="clearChat()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-lg transition-all border border-gray-700">
+                Clear Chat 🗑️
+            </button>
+        </div>
+    </header>
+    <!-- MAIN CHAT CONTAINER -->
+    <main class="flex-1 flex flex-col max-w-5xl w-full mx-auto p-6 overflow-hidden">
+        
+        <!-- Quick Suggestion Pills -->
+        <div class="flex items-center gap-2 pb-4 overflow-x-auto whitespace-nowrap scrollbar-none">
+            <span class="text-xs text-gray-400 font-semibold uppercase tracking-wider mr-1">Explore:</span>
+            <button onclick="sendQuickPrompt('What are Quantum Algorithms?')" class="text-xs bg-gray-900 hover:bg-gray-800 text-cyan-300 border border-gray-800 px-3 py-1.5 rounded-full transition-all">
+                🧠 What are Quantum Algorithms?
+            </button>
+            <button onclick="sendQuickPrompt('What are the core techniques used in quantum algorithms?')" class="text-xs bg-gray-900 hover:bg-gray-800 text-cyan-300 border border-gray-800 px-3 py-1.5 rounded-full transition-all">
+                ⚙️ Core Techniques
+            </button>
+            <button onclick="sendQuickPrompt('List and explain all major quantum algorithms')" class="text-xs bg-gray-900 hover:bg-gray-800 text-cyan-300 border border-gray-800 px-3 py-1.5 rounded-full transition-all">
+                📚 All Quantum Algorithms
+            </button>
+            <button onclick="sendQuickPrompt('How do quantum algorithms differ from classical algorithms?')" class="text-xs bg-gray-900 hover:bg-gray-800 text-cyan-300 border border-gray-800 px-3 py-1.5 rounded-full transition-all">
+                ⚖️ Quantum vs Classical
+            </button>
+        </div>
+
+        <!-- Chat Messages Box -->
+        <div id="chatContainer" class="flex-1 bg-gray-900/60 border border-gray-800 rounded-2xl p-6 overflow-y-auto space-y-4 shadow-xl flex flex-col">
+            <!-- Messages injected dynamically via JavaScript -->
+        </div>
+
+        <!-- Typing Indicator (Hidden by default) -->
+        <div id="typingIndicator" class="hidden items-center space-x-2 text-xs text-gray-400 py-2 px-2">
+            <div class="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
+            <div class="w-2 h-2 bg-cyan-400 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+            <div class="w-2 h-2 bg-cyan-400 rounded-full animate-bounce [animation-delay:0.4s]"></div>
+            <span>AI is analyzing quantum concepts...</span>
+        </div>
+
+        <!-- Input Box Area -->
+        <div class="mt-4 flex items-center gap-3 bg-gray-900 border border-gray-800 p-2 rounded-2xl shadow-lg">
+            <input type="text" id="chatInput" placeholder="Ask anything about quantum algorithms (e.g., 'What are quantum algorithms?', 'Core techniques', 'List all algorithms')..." 
+                class="flex-1 bg-transparent px-4 py-3 text-sm text-white focus:outline-none placeholder-gray-500"
+                onkeypress="if(event.key === 'Enter') handleSendMessage()">
+            <button onclick="handleSendMessage()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-cyan-600/30 flex items-center gap-2">
+                <span>Send</span>
+                <span>🚀</span>
+            </button>
+        </div>
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        let chatMessages = [
+            { 
+                sender: 'ai', 
+                text: "Hello! 👋 I am your Quantum AI Tutor. Ask me anything about <strong>Quantum Algorithms</strong>—their concepts, core techniques (Superposition, Interference, Oracles), or any specific algorithm you want to learn!" 
+            }
+        ];
+
+        function renderChat() {
+            const container = document.getElementById('chatContainer');
+            container.innerHTML = chatMessages.map(msg => `
+                <div class="flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}">
+                    <div class="max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-md ${
+                        msg.sender === 'user' 
+                            ? 'bg-cyan-600 text-white rounded-br-none font-medium' 
+                            : 'bg-gray-800 text-gray-200 border border-gray-700 rounded-bl-none space-y-2'
+                    }">
+                        ${msg.text}
+                    </div>
+                </div>
+            `).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function handleSendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if(!text) return;
+
+            // Push User Message
+            chatMessages.push({ sender: 'user', text: text });
+            input.value = '';
+            renderChat();
+
+            // Show Typing Indicator
+            document.getElementById('typingIndicator').classList.remove('hidden');
+            document.getElementById('typingIndicator').classList.add('flex');
+
+            // Generate AI Response
+            setTimeout(() => {
+                document.getElementById('typingIndicator').classList.remove('flex');
+                document.getElementById('typingIndicator').classList.add('hidden');
+
+                let aiReply = getQuantumAlgorithmConceptResponse(text);
+
+                chatMessages.push({ sender: 'ai', text: aiReply });
+                renderChat();
+            }, 700);
+        }
+
+        function getQuantumAlgorithmConceptResponse(query) {
+            const lower = query.toLowerCase();
+
+            // 1. General Greetings
+            if (lower.includes('hi') || lower.includes('hello') || lower.includes('hey')) {
+                return "Hi there! 😊 Ready to explore the fascinating world of Quantum Algorithms? Feel free to ask me anything!";
+            }
+            if (lower.includes('who are you')) {
+                return "I am your specialized Quantum Algorithm AI Tutor, designed to answer any concept, technique, or algorithm in quantum computing!";
+            }
+
+            // 2. What are Quantum Algorithms?
+            if (lower.includes('what are quantum algorithms') || (lower.includes('quantum algorithm') && !lower.includes('list') && !lower.includes('types'))) {
+                return `
+                    <p>🧠 <strong>What is a Quantum Algorithm?</strong></p>
+                    <p>A <strong>Quantum Algorithm</strong> is a step-by-step procedure executed on a quantum computer (using qubits). Unlike classical algorithms that process bits sequentially (0 or 1), quantum algorithms leverage the laws of quantum mechanics to process massive amounts of data simultaneously.</p>
+                    <p><strong>Main Purpose:</strong> They are designed to solve specific mathematical, optimization, and simulation problems exponentially or quadratically faster than the best known classical algorithms.</p>
+                `;
+            }
+
+            // 3. Core Techniques in Quantum Algorithms
+            if (lower.includes('technique') || lower.includes('how they work') || lower.includes('building blocks')) {
+                return `
+                    <p>⚙️ <strong>Core Techniques Behind Quantum Algorithms:</strong></p>
+                    <p>Most quantum algorithms are built using a combination of these fundamental quantum phenomena:</p>
+                    <ul class="list-disc pl-5 space-y-1.5 text-xs text-gray-300 mt-1">
+                        <li><strong>Quantum Superposition:</strong> Allows qubits to evaluate multiple inputs and states simultaneously.</li>
+                        <li><strong>Quantum Entanglement:</strong> Links qubits together to coordinate states instantaneously across the register.</li>
+                        <li><strong>Quantum Interference:</strong> Constructive interference amplifies the probability of correct answers, while destructive interference cancels out wrong answers.</li>
+                        <li><strong>Quantum Oracles:</strong> Black-box subroutines that check or mark target solutions without destroying superposition.</li>
+                    </ul>
+                `;
+            }
+
+            // 4. List and Explain All Major Quantum Algorithms
+            if (lower.includes('list') || lower.includes('all') || lower.includes('types of quantum') || lower.includes('major quantum')) {
+                return `
+                    <p>📚 <strong>Comprehensive List of Major Quantum Algorithms:</strong></p>
+                    <p>Quantum algorithms are generally divided into several key categories based on what they achieve:</p>
+                    <ul class="list-disc pl-5 space-y-2 text-xs text-gray-300 mt-1">
+                        <li><strong>1. Shor's Algorithm:</strong> Finds prime factors of large numbers exponentially fast, threatening modern RSA encryption.</li>
+                        <li><strong>2. Grover's Algorithm:</strong> Searches unstructured databases with quadratic speedup ($O(\sqrt{N})$).</li>
+                        <li><strong>3. Quantum Fourier Transform (QFT):</strong> The backbone backend for frequency analysis and period-finding routines.</li>
+                        <li><strong>4. Quantum Phase Estimation (QPE):</strong> Measures eigenvalues/phases of unitary operators; vital for simulations.</li>
+                        <li><strong>5. Deutsch-Jozsa Algorithm:</strong> The historical pioneer proving quantum advantage with a single query.</li>
+                        <li><strong>6. Variational Quantum Eigensolver (VQE):</strong> A hybrid algorithm used in chemistry and drug discovery for NISQ hardware.</li>
+                        <li><strong>7. HHL Algorithm (Harrow-Hassidim-Lloyd):</strong> Solves systems of linear equations exponentially faster than classical computers.</li>
+                        <li><strong>8. Quantum Approximate Optimization Algorithm (QAOA):</strong> Solves complex combinatorial optimization problems (e.g., routing, logistics).</li>
+                    </ul>
+                `;
+            }
+
+            // 5. Quantum vs Classical Algorithms
+            if (lower.includes('differ') || lower.includes('versus') || lower.includes('vs') || lower.includes('comparison')) {
+                return `
+                    <p>⚖️ <strong>Quantum vs Classical Algorithms:</strong></p>
+                    <ul class="list-disc pl-5 space-y-1.5 text-xs text-gray-300 mt-1">
+                        <li><strong>Data Units:</strong> Classical algorithms use bits (0 or 1); Quantum algorithms use Qubits (Superposition).</li>
+                        <li><strong>Execution:</strong> Classical algorithms evaluate paths one-by-one; Quantum algorithms explore multiple solution paths in parallel using interference.</li>
+                        <li><strong>Efficiency:</strong> Some problems take polynomial or exponential time classically, but can be solved in polynomial or logarithmic time quantum-mechanically.</li>
+                    </ul>
+                `;
+            }
+
+            // 6. Specific individual checks (Shor, Grover, VQE, QFT, etc.)
+            if (lower.includes('shor')) {
+                return `<p>⚡ <strong>Shor's Algorithm:</strong> Discovered by Peter Shor (1994). It solves prime factorization and discrete logarithms exponentially faster using period-finding and QFT, making it famous for breaking RSA cryptography.</p>`;
+            }
+            if (lower.includes('grover')) {
+                return `<p>🔍 <strong>Grover's Algorithm:</strong> Developed by Lov Grover (1996). It provides quadratic speedup for searching unstructured databases using amplitude amplification.</p>`;
+            }
+            if (lower.includes('vqe')) {
+                return `<p>🧪 <strong>VQE (Variational Quantum Eigensolver):</strong> A hybrid quantum-classical algorithm optimized for near-term noisy quantum hardware (NISQ) to simulate molecular ground-state energies.</p>`;
+            }
+            if (lower.includes('hhl')) {
+                return `<p>📈 <strong>HHL Algorithm:</strong> A landmark quantum algorithm for solving linear systems of equations, serving as a core routine for quantum machine learning and data analysis.</p>`;
+            }
+
+            // Default Fallback
+            else {
+                return `
+                    <p>That's a broad and great question about <strong>Quantum Algorithms</strong>! ⚛️</p>
+                    <p>I can help you understand any concept related to them. Try asking me:</p>
+                    <ul class="list-disc pl-5 space-y-1 text-xs text-gray-300 mt-1">
+                        <li><em>"What are the core techniques in quantum algorithms?"</em></li>
+                        <li><em>"List all major quantum algorithms"</em></li>
+                        <li><em>"Explain HHL or QAOA algorithm"</em></li>
+                        <li><em>"How do quantum algorithms work?"</em></li>
+                    </ul>
+                `;
+            }
+        }
+
+        function sendQuickPrompt(promptText) {
+            document.getElementById('chatInput').value = promptText;
+            handleSendMessage();
+        }
+
+        function clearChat() {
+            chatMessages = [
+                { sender: 'ai', text: "Chat history cleared! What quantum algorithm concept would you like to discuss next?" }
+            ];
+            renderChat();
+        }
+
+        // Initial render on load
+        renderChat();
+    </script>
+</body>
+</html>

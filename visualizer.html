@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Quantum Algorithm Visualizer</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    color:white;
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 20% 20%,#172a55 0%,transparent 35%),
+        radial-gradient(circle at 80% 70%,#24154d 0%,transparent 35%),
+        #040712;
+}
+
+/* HEADER */
+header{
+    height:70px;
+    padding:0 35px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:#070c1b;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+.logo{
+    font-size:23px;
+    font-weight:bold;
+}
+
+.logo span{
+    color:#55e8ff;
+}
+
+.badge{
+    padding:9px 16px;
+    border-radius:20px;
+    color:#55efbd;
+    background:#10372e;
+    border:1px solid #32b98c;
+    font-size:12px;
+}
+
+/* MAIN */
+main{
+    max-width:1450px;
+    margin:auto;
+    padding:35px;
+}
+
+/* INTRO */
+.intro{
+    text-align:center;
+    max-width:900px;
+    margin:10px auto 35px;
+}
+
+.intro h1{
+    font-size:42px;
+    margin-bottom:15px;
+}
+
+.intro h1 span{
+    color:#55e8ff;
+}
+
+.intro p{
+    color:#8e9bb7;
+    line-height:1.8;
+}
+
+/* ALGORITHM CARDS */
+.algorithms{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:15px;
+    margin-bottom:30px;
+}
+
+.algorithm-card{
+    padding:20px;
+    min-height:150px;
+    border-radius:18px;
+    cursor:pointer;
+    background:#0b1227;
+    border:1px solid rgba(255,255,255,.08);
+    transition:.3s;
+}
+
+.algorithm-card:hover{
+    transform:translateY(-5px);
+    border-color:#55e8ff;
+}
+
+.algorithm-card.active{
+    border-color:#55e8ff;
+    background:linear-gradient(145deg,#102a4b,#0a1023);
+    box-shadow:0 0 25px rgba(85,232,255,.15);
+}
+
+.icon{
+    font-size:32px;
+    margin-bottom:12px;
+}
+
+.algorithm-card h3{
+    font-size:16px;
+    margin-bottom:8px;
+}
+
+.algorithm-card p{
+    color:#7f8ca8;
+    font-size:12px;
+    line-height:1.6;
+}
+
+/* VISUALIZER */
+.visualizer{
+    overflow:hidden;
+    border-radius:25px;
+    background:#070d20;
+    border:1px solid rgba(255,255,255,.1);
+    box-shadow:0 30px 100px rgba(0,0,0,.5);
+}
+
+.progress{
+    height:5px;
+    background:#111a32;
+}
+
+.progress-bar{
+    width:20%;
+    height:100%;
+    background:#55e8ff;
+    transition:.5s;
+}
+
+.visualizer-header{
+    padding:24px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.visualizer-header h2{
+    font-size:25px;
+}
+
+.visualizer-header p{
+    color:#7f8ca8;
+    margin-top:7px;
+}
+
+.step-counter{
+    color:#55e8ff;
+    font-weight:bold;
+}
+
+/* LEARNING AREA */
+.learning-area{
+    display:grid;
+    grid-template-columns:1.3fr .7fr;
+    min-height:650px;
+}
+
+/* VISUAL AREA */
+.visual-panel{
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+        radial-gradient(circle at center,#142b54,#070b1c 72%);
+}
+
+.grid{
+    position:absolute;
+    inset:0;
+    background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+    background-size:40px 40px;
+    animation:gridMove 12s linear infinite;
+}
+
+@keyframes gridMove{
+    from{transform:translate(0,0)}
+    to{transform:translate(40px,40px)}
+}
+
+.visual-wrapper{
+    position:relative;
+    z-index:2;
+    width:100%;
+    min-height:650px;
+    padding:30px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+.visual-label{
+    color:#55e8ff;
+    font-size:11px;
+    letter-spacing:3px;
+    font-weight:bold;
+}
+
+.visual-step{
+    margin-top:7px;
+    color:#8997b2;
+    font-size:14px;
+}
+
+.visual-content{
+    width:100%;
+    text-align:center;
+    margin-top:20px;
+    min-height:270px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.visual-content.animate{
+    animation:visualEnter .7s ease;
+}
+
+@keyframes visualEnter{
+    0%{
+        opacity:0;
+        transform:scale(.7) translateY(25px);
+        filter:blur(8px);
+    }
+    60%{
+        opacity:1;
+        transform:scale(1.05);
+        filter:blur(0);
+    }
+    100%{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+.visual-caption{
+    max-width:600px;
+    text-align:center;
+    color:#8f9db9;
+    font-size:14px;
+    line-height:1.7;
+    min-height:50px;
+}
+
+/* VISUAL NAVIGATION */
+.visual-navigation{
+    width:100%;
+    max-width:700px;
+    margin-top:30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+}
+
+.visual-navigation button{
+    min-width:135px;
+    padding:12px 18px;
+    border-radius:11px;
+    border:1px solid #34446b;
+    background:#101a35;
+    color:white;
+    cursor:pointer;
+    font-weight:bold;
+    transition:.3s;
+}
+
+.visual-navigation button:hover:not(:disabled){
+    color:#55e8ff;
+    border-color:#55e8ff;
+    transform:translateY(-3px);
+}
+
+.visual-navigation .next{
+    background:#315ff0;
+    border-color:#315ff0;
+}
+
+.visual-navigation .next:hover:not(:disabled){
+    color:white;
+    box-shadow:0 0 25px rgba(49,95,240,.45);
+}
+
+.visual-navigation button:disabled{
+    opacity:.3;
+    cursor:not-allowed;
+}
+
+.dots{
+    display:flex;
+    align-items:center;
+    gap:7px;
+}
+
+.dot{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#34415d;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.dot.active{
+    width:28px;
+    border-radius:10px;
+    background:#55e8ff;
+    box-shadow:0 0 12px #55e8ff;
+}
+
+/* EXPLANATION */
+.explanation{
+    padding:35px;
+    border-left:1px solid rgba(255,255,255,.08);
+}
+
+.label{
+    color:#55e8ff;
+    font-size:11px;
+    font-weight:bold;
+    letter-spacing:2px;
+}
+
+.explanation h2{
+    margin:10px 0 15px;
+    font-size:25px;
+}
+
+.main-text{
+    color:#a4afc3;
+    line-height:1.9;
+    font-size:14px;
+}
+
+.info{
+    margin-top:18px;
+    padding:17px;
+    border-radius:12px;
+    background:#101a34;
+    border-left:3px solid #55e8ff;
+}
+
+.info h4{
+    color:#55e8ff;
+    font-size:13px;
+    margin-bottom:8px;
+}
+
+.info p{
+    color:#8997b1;
+    font-size:13px;
+    line-height:1.7;
+}
+
+/* BOTTOM CONTROLS */
+.controls{
+    padding:20px 30px;
+    border-top:1px solid rgba(255,255,255,.08);
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.controls button{
+    padding:11px 18px;
+    border-radius:10px;
+    border:1px solid #34446b;
+    background:#101a35;
+    color:white;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.controls button:hover{
+    border-color:#55e8ff;
+    color:#55e8ff;
+}
+
+/* QUANTUM VISUALS */
+
+.qubit{
+    width:150px;
+    height:150px;
+    margin:auto;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:24px;
+    font-weight:bold;
+    background:radial-gradient(circle at 30% 25%,white,#55e8ff 8%,#526dff 35%,#07112d 72%);
+    box-shadow:0 0 40px #55e8ff,0 0 100px rgba(85,232,255,.25);
+    animation:floatQubit 2.5s infinite;
+}
+
+@keyframes floatQubit{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-15px)}
+}
+
+.states{
+    display:flex;
+    justify-content:center;
+    gap:35px;
+}
+
+.state{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#101d3c;
+    border:2px solid #526793;
+    font-size:22px;
+    transition:.4s;
+}
+
+.state:hover{
+    transform:scale(1.12);
+    border-color:#55e8ff;
+    box-shadow:0 0 30px rgba(85,232,255,.5);
+}
+
+/* SUPERPOSITION */
+.super{
+    width:170px;
+    height:170px;
+    margin:auto;
+    border:3px solid #55e8ff;
+    border-radius:50%;
+    position:relative;
+    box-shadow:0 0 40px rgba(85,232,255,.35);
+    animation:superPulse 2s infinite;
+}
+
+.super:before{
+    content:"|0⟩";
+    position:absolute;
+    top:20px;
+    left:25px;
+    color:#55e8ff;
+    font-size:20px;
+}
+
+.super:after{
+    content:"|1⟩";
+    position:absolute;
+    bottom:20px;
+    right:25px;
+    color:#bd82ff;
+    font-size:20px;
+}
+
+@keyframes superPulse{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.1)}
+}
+
+/* GATES */
+.flow{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:22px;
+}
+
+.gate{
+    width:100px;
+    height:100px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#10224b;
+    border:3px solid #55e8ff;
+    color:#55e8ff;
+    font-size:30px;
+    font-weight:bold;
+    box-shadow:0 0 30px rgba(85,232,255,.35);
+    animation:gatePulse 1.7s infinite;
+}
+
+@keyframes gatePulse{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.08) rotate(3deg)}
+}
+
+.arrow{
+    font-size:42px;
+    color:#818cff;
+    animation:arrowMove 1.3s infinite;
+}
+
+@keyframes arrowMove{
+    0%,100%{transform:translateX(0)}
+    50%{transform:translateX(10px)}
+}
+
+/* SEARCH */
+.boxes{
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+.search-box{
+    width:90px;
+    height:90px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    border-radius:15px;
+    background:#101d3d;
+    border:2px solid #40557f;
+    font-size:24px;
+}
+
+.target{
+    border-color:#ffd35a!important;
+    box-shadow:0 0 35px #ffd35a;
+    animation:targetPulse 1s infinite;
+}
+
+@keyframes targetPulse{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.12)}
+}
+
+/* BARS */
+.bars{
+    height:240px;
+    display:flex;
+    justify-content:center;
+    align-items:end;
+    gap:16px;
+}
+
+.bar{
+    width:48px;
+    border-radius:7px 7px 0 0;
+    background:#42598e;
+    transition:.8s;
+}
+
+.bar.gold{
+    background:#ffd35a;
+    box-shadow:0 0 25px rgba(255,211,90,.7);
+}
+
+/* MEASUREMENT */
+.measurement{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+}
+
+.measure{
+    width:110px;
+    height:110px;
+    border-radius:50%;
+    border:3px solid #ffd35a;
+    color:#ffd35a;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:30px;
+    box-shadow:0 0 35px rgba(255,211,90,.6);
+    animation:measurePulse 1.5s infinite;
+}
+
+@keyframes measurePulse{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.12)}
+}
+
+/* FUNCTION */
+.function{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:25px;
+}
+
+.function-box{
+    min-width:130px;
+    padding:30px;
+    border-radius:16px;
+    background:#111f40;
+    border:2px solid #55e8ff;
+    font-size:24px;
+    box-shadow:0 0 25px rgba(85,232,255,.3);
+}
+
+/* HIDDEN STRING */
+.secret{
+    font-size:60px;
+    letter-spacing:15px;
+    color:#55e8ff;
+    text-shadow:0 0 30px #55e8ff;
+    animation:glow 2s infinite;
+}
+
+@keyframes glow{
+    0%,100%{opacity:.65}
+    50%{opacity:1}
+}
+
+/* ENTANGLEMENT */
+.entangled{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:25px;
+}
+
+.entangle-line{
+    width:140px;
+    height:4px;
+    background:#55e8ff;
+    box-shadow:0 0 20px #55e8ff;
+    animation:energy 1s infinite;
+}
+
+@keyframes energy{
+    0%,100%{opacity:.3}
+    50%{opacity:1}
+}
+
+/* TELEPORT PEOPLE */
+.people{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:30px;
+    font-size:65px;
+}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+
+    .algorithms{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .learning-area{
+        grid-template-columns:1fr;
+    }
+
+    .explanation{
+        border-left:0;
+        border-top:1px solid rgba(255,255,255,.08);
+    }
+}
+
+@media(max-width:700px){
+
+    main{
+        padding:15px;
+    }
+
+    header{
+        padding:0 15px;
+    }
+
+    .intro h1{
+        font-size:30px;
+    }
+
+    .algorithms{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .visual-wrapper{
+        min-height:550px;
+    }
+
+    .visual-navigation button{
+        min-width:95px;
+        padding:10px;
+        font-size:12px;
+    }
+
+    .flow{
+        gap:8px;
+    }
+
+    .gate{
+        width:70px;
+        height:70px;
+    }
+
+    .arrow{
+        font-size:30px;
+    }
+
+    .states{
+        gap:12px;
+    }
+}
+
+@media(max-width:450px){
+
+    .algorithms{
+        grid-template-columns:1fr;
+    }
+
+    .badge{
+        display:none;
+    }
+
+    .visual-navigation{
+        gap:5px;
+    }
+
+    .dots{
+        display:none;
+    }
+
+    .explanation{
+        padding:25px 20px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        ⚛ Quantum <span>Visualizer</span>
+    </div>
+
+    <div class="badge">
+        🌱 BEGINNER MODE
+    </div>
+
+</header>
+
+<main>
+
+<section class="intro">
+
+    <h1>
+        Learn Quantum Algorithms
+        <span>Visually</span>
+    </h1>
+
+    <p>
+        No previous quantum computing knowledge is required.
+        Select an algorithm and learn what is happening at every
+        step through interactive animations, simple explanations
+        and voice guidance.
+    </p>
+
+</section>
+
+
+<!-- ALGORITHMS -->
+
+<section class="algorithms">
+
+    <div class="algorithm-card active"
+         id="card-grover"
+         onclick="selectAlgorithm('grover')">
+
+        <div class="icon">🔎</div>
+
+        <h3>Grover's Algorithm</h3>
+
+        <p>
+            Search an unstructured space using
+            quantum amplitude amplification.
+        </p>
+
+    </div>
+
+
+    <div class="algorithm-card"
+         id="card-shor"
+         onclick="selectAlgorithm('shor')">
+
+        <div class="icon">🔐</div>
+
+        <h3>Shor's Algorithm</h3>
+
+        <p>
+            Understand quantum period finding
+            and integer factorization.
+        </p>
+
+    </div>
+
+
+    <div class="algorithm-card"
+         id="card-deutsch"
+         onclick="selectAlgorithm('deutsch')">
+
+        <div class="icon">⚡</div>
+
+        <h3>Deutsch-Jozsa</h3>
+
+        <p>
+            Determine whether a function is
+            constant or balanced.
+        </p>
+
+    </div>
+
+
+    <div class="algorithm-card"
+         id="card-bv"
+         onclick="selectAlgorithm('bv')">
+
+        <div class="icon">🧩</div>
+
+        <h3>Bernstein-Vazirani</h3>
+
+        <p>
+            Discover a hidden binary string
+            using a quantum oracle.
+        </p>
+
+    </div>
+
+
+    <div class="algorithm-card"
+         id="card-teleport"
+         onclick="selectAlgorithm('teleport')">
+
+        <div class="icon">📡</div>
+
+        <h3>Quantum Teleportation</h3>
+
+        <p>
+            Learn how entanglement transfers
+            an unknown quantum state.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- VISUALIZER -->
+
+<section class="visualizer">
+
+    <div class="progress">
+
+        <div class="progress-bar"
+             id="progressBar">
+        </div>
+
+    </div>
+
+
+    <div class="visualizer-header">
+
+        <div>
+
+            <h2 id="algorithmTitle">
+                🔎 Grover's Algorithm
+            </h2>
+
+            <p id="algorithmSubtitle">
+                Quantum search explained step by step
+            </p>
+
+        </div>
+
+        <div class="step-counter"
+             id="stepCounter">
+
+            Step 1 / 5
+
+        </div>
+
+    </div>
+
+
+    <div class="learning-area">
+
+
+        <!-- VISUALIZATION -->
+
+        <div class="visual-panel">
+
+            <div class="grid"></div>
+
+            <div class="visual-wrapper">
+
+                <div class="visual-label">
+                    INTERACTIVE VISUALIZATION
+                </div>
+
+                <div class="visual-step"
+                     id="visualStep">
+                    Step 1
+                </div>
+
+                <div class="visual-content"
+                     id="visualContent">
+                </div>
+
+                <div class="visual-caption"
+                     id="visualCaption">
+                </div>
+
+
+                <!-- PREVIOUS / NEXT -->
+                <div class="visual-navigation">
+
+                    <button
+                        id="previousButton"
+                        onclick="previousStep()">
+
+                        ← Previous
+
+                    </button>
+
+
+                    <div class="dots"
+                         id="dots">
+                    </div>
+
+
+                    <button
+                        id="nextButton"
+                        class="next"
+                        onclick="nextStep()">
+
+                        Next →
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- EXPLANATION -->
+
+        <div class="explanation">
+
+            <div class="label">
+                WHAT IS HAPPENING?
+            </div>
+
+            <h2 id="stepTitle">
+                Understanding the problem
+            </h2>
+
+            <p class="main-text"
+               id="stepExplanation">
+            </p>
+
+
+            <div class="info">
+
+                <h4>
+                    ❓ WHY ARE WE DOING THIS?
+                </h4>
+
+                <p id="stepWhy"></p>
+
+            </div>
+
+
+            <div class="info">
+
+                <h4>
+                    👤 SIMPLE HUMAN EXAMPLE
+                </h4>
+
+                <p id="stepExample"></p>
+
+            </div>
+
+
+            <div class="info">
+
+                <h4>
+                    🧠 REMEMBER
+                </h4>
+
+                <p id="stepRemember"></p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTROLS -->
+
+    <div class="controls">
+
+        <button onclick="togglePlay()"
+                id="playButton">
+            ▶ Play Steps
+        </button>
+
+        <button onclick="restartAlgorithm()">
+            ↻ Replay
+        </button>
+
+        <button onclick="speakCurrentStep()">
+            🔊 Explain This Step
+        </button>
+
+        <button onclick="stopVoice()">
+            🔇 Stop Voice
+        </button>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<script>
+
+/* =========================================================
+   QUANTUM ALGORITHM DATA
+========================================================= */
+
+const algorithms = {
+
+/* =========================================================
+   GROVER
+========================================================= */
+
+grover:{
+
+    title:"🔎 Grover's Algorithm",
+
+    subtitle:"Quantum search explained step by step",
+
+    steps:[
+
+        {
+            title:"Understand the Search Problem",
+
+            explanation:
+            "Imagine that we have several boxes and only one contains the answer. A classical computer may need to search through the boxes one by one. Grover's algorithm provides a quantum strategy for searching an unstructured space more efficiently.",
+
+            why:
+            "Before using quantum operations, we first need to understand what we are searching for.",
+
+            example:
+            "Imagine four boxes. One contains your phone. You do not know which one. A classical approach may check the boxes one at a time.",
+
+            remember:
+            "Grover's algorithm is a quantum search algorithm.",
+
+            visual:`
+                <div>
+                    <div class="boxes">
+                        <div class="search-box">❌</div>
+                        <div class="search-box">❌</div>
+                        <div class="search-box target">🎯</div>
+                        <div class="search-box">❌</div>
+                    </div>
+                    <p style="margin-top:25px;color:#8d9ab5">
+                        One hidden target
+                    </p>
+                </div>
+            `
+        },
+
+        {
+            title:"Create Quantum Superposition",
+
+            explanation:
+            "We initialize the qubits and apply Hadamard gates. The Hadamard operation creates a superposition in which multiple computational basis states have amplitudes.",
+
+            why:
+            "We want the quantum system to represent many possible candidates together.",
+
+            example:
+            "Instead of choosing one box immediately, imagine creating a quantum state representing all four possible boxes.",
+
+            remember:
+            "Hadamard gates are commonly used to create equal superposition.",
+
+            visual:`
+                <div>
+                    <div class="flow">
+                        <div class="state">|0⟩</div>
+                        <div class="arrow">→</div>
+                        <div class="gate">H</div>
+                        <div class="arrow">→</div>
+                        <div class="super"></div>
+                    </div>
+                </div>
+            `
+        },
+
+        {
+            title:"Oracle Marks the Target",
+
+            explanation:
+            "The oracle recognizes the desired state and changes its phase. The target is marked without simply revealing the answer directly.",
+
+            why:
+            "The quantum algorithm needs to distinguish the correct answer from the other candidates.",
+
+            example:
+            "Imagine placing an invisible marker on the correct box. We cannot see the marker directly, but the quantum process can use it.",
+
+            remember:
+            "The oracle marks the target by changing its phase.",
+
+            visual:`
+                <div>
+                    <div class="boxes">
+                        <div class="search-box">A</div>
+                        <div class="search-box">B</div>
+                        <div class="search-box target">🎯</div>
+                        <div class="search-box">D</div>
+                    </div>
+                    <div class="arrow" style="margin:20px">
+                        ↓
+                    </div>
+                    <div class="gate" style="margin:auto">
+                        O
+                    </div>
+                </div>
+            `
+        },
+
+        {
+            title:"Amplify the Target",
+
+            explanation:
+            "The diffusion operation changes the amplitudes. The amplitude of the marked state becomes larger while unwanted amplitudes become smaller.",
+
+            why:
+            "We want the probability of observing the target to become high.",
+
+            example:
+            "Imagine many people speaking at the same time. Quantum interference can make the useful voice louder and the others quieter.",
+
+            remember:
+            "Amplitude amplification increases the target's probability.",
+
+            visual:`
+                <div>
+                    <div class="bars">
+                        <div class="bar" style="height:55px"></div>
+                        <div class="bar" style="height:75px"></div>
+                        <div class="bar gold" style="height:200px"></div>
+                        <div class="bar" style="height:50px"></div>
+                    </div>
+                    <p style="color:#ffd35a;margin-top:20px">
+                        Target amplitude ↑
+                    </p>
+                </div>
+            `
+        },
+
+        {
+            title:"Measure the Result",
+
+            explanation:
+            "After amplitude amplification, we measure the quantum register. The target state has a high probability of being observed.",
+
+            why:
+            "Measurement converts the quantum state into a classical result that we can read.",
+
+            example:
+            "After the quantum search process finishes, we finally read the result and discover the hidden item.",
+
+            remember:
+            "Measurement gives the classical answer.",
+
+            visual:`
+                <div class="measurement">
+                    <div class="qubit">|ψ⟩</div>
+                    <div class="arrow">→</div>
+                    <div class="measure">M</div>
+                    <div class="arrow">→</div>
+                    <div class="state">🎯</div>
+                </div>
+            `
+        }
+
+    ]
+},
+
+
+/* =========================================================
+   SHOR
+========================================================= */
+
+shor:{
+
+    title:"🔐 Shor's Algorithm",
+
+    subtitle:"Quantum period finding and factorization",
+
+    steps:[
+
+        {
+            title:"Choose a Number",
+
+            explanation:
+            "Suppose we want to factor a composite number. For learning purposes, we can use N = 15. The objective is to discover its non-trivial factors.",
+
+            why:
+            "Shor's algorithm provides a quantum approach to integer factorization.",
+
+            example:
+            "We know 15 can be written as 3 × 5. The algorithm demonstrates how quantum period finding can help discover these factors.",
+
+            remember:
+            "The goal is to find factors of N.",
+
+            visual:`
+                <div>
+                    <div style="font-size:70px;color:#55e8ff;font-weight:bold">
+                        N = 15
+                    </div>
+                    <p style="margin-top:20px;color:#8d9ab5">
+                        Find its factors
+                    </p>
+                </div>
+            `
+        },
+
+        {
+            title:"Create a Periodic Function",
+
+            explanation:
+            "Shor's algorithm transforms factorization into a period-finding problem. A function such as f(x) = aˣ mod N produces a repeating mathematical pattern.",
+
+            why:
+            "The hidden period contains information that can eventually be converted into factors.",
+
+            example:
+            "Imagine a light flashing in a repeating pattern. If we discover how often it repeats, we can learn something about the system producing it.",
+
+            remember:
+            "Factorization is transformed into period finding.",
+
+            visual:`
+                <div class="function">
+                    <div class="function-box">
+                        f(x)
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="function-box">
+                        aˣ mod N
+                    </div>
+                </div>
+            `
+        },
+
+        {
+            title:"Create Superposition",
+
+            explanation:
+            "The quantum register is placed into a superposition of possible input values. This allows the quantum state to represent information about many possible x values.",
+
+            why:
+            "Quantum superposition allows the periodic structure to be encoded coherently.",
+
+            example:
+            "Instead of examining one possible input at a time, imagine representing many possibilities together.",
+
+            remember:
+            "Superposition represents many possible inputs.",
+
+            visual:`
+                <div class="flow">
+                    <div class="state">0</div>
+                    <div class="arrow">→</div>
+                    <div class="super"></div>
+                    <div class="arrow">→</div>
+                    <div class="state">1</div>
+                </div>
+            `
+        },
+
+        {
+            title:"Find the Hidden Period",
+
+            explanation:
+            "The quantum Fourier transform is used within the period-finding procedure. It converts periodic information into a form from which the period can be estimated.",
+
+            why:
+            "Finding the period is the important quantum subroutine of Shor's algorithm.",
+
+            example:
+            "Imagine recording the positions of a repeating wave. The pattern of peaks can help reveal the repetition interval.",
+
+            remember:
+            "The quantum Fourier transform helps extract periodic information.",
+
+            visual:`
+                <div>
+                    <div class="bars">
+                        <div class="bar" style="height:50px"></div>
+                        <div class="bar gold" style="height:160px"></div>
+                        <div class="bar" style="height:55px"></div>
+                        <div class="bar gold" style="height:160px"></div>
+                        <div class="bar" style="height:50px"></div>
+                    </div>
+                    <p style="color:#55e8ff;margin-top:20px">
+                        Repeating pattern
+                    </p>
+                </div>
+            `
+        },
+
+        {
+            title:"Classical Post-Processing",
+
+            explanation:
+            "After measuring the quantum circuit, classical mathematics processes the estimated period. Under appropriate conditions, this information can be used to derive non-trivial factors of N.",
+
+            why:
+            "Quantum and classical computation work together. The quantum computer finds periodic information and classical mathematics completes the calculation.",
+
+            example:
+            "Think of the quantum computer as finding a hidden clue and the classical computer as using that clue to solve the final puzzle.",
+
+            remember:
+            "Shor's algorithm combines quantum period finding with classical computation.",
+
+            visual:`
+                <div>
+                    <div style="font-size:45px;color:#55e8ff">
+                        Period
+                    </div>
+                    <div class="arrow">↓</div>
+                    <div style="font-size:45px;color:#ffd35a">
+                        Factors
+                    </div>
+                </div>
+            `
+        }
+
+    ]
+},
+
+
+/* =========================================================
+   DEUTSCH JOZSA
+========================================================= */
+
+deutsch:{
+
+    title:"⚡ Deutsch-Jozsa Algorithm",
+
+    subtitle:"Determine whether a function is constant or balanced",
+
+    steps:[
+
+        {
+            title:"Understand the Hidden Function",
+
+            explanation:
+            "We are given a black-box function that is promised to be either constant or balanced. A constant function produces the same output for every input, while a balanced function produces each output equally often.",
+
+            why:
+            "The objective is to determine a global property of the function.",
+
+            example:
+            "Imagine a mystery machine. Either every button produces the same color or half the buttons produce one color and the other half another color.",
+
+            remember:
+            "Deutsch-Jozsa distinguishes constant and balanced functions.",
+
+            visual:`
+                <div class="function">
+                    <div class="function-box">f(x)</div>
+                    <div class="arrow">→</div>
+                    <div class="function-box">?</div>
+                </div>
+            `
+        },
+
+        {
+            title:"Prepare the Qubits",
+
+            explanation:
+            "We initialize the quantum state and apply Hadamard gates. This produces a superposition of possible input states.",
+
+            why:
+            "Superposition allows the circuit to process information about multiple possible inputs coherently.",
+
+            example:
+            "Instead of pressing one button on the mystery machine, imagine representing many possible button choices at once.",
+
+            remember:
+            "Hadamard gates create the required superposition.",
+
+            visual:`
+                <div class="flow">
+                    <div class="state">|0⟩</div>
+                    <div class="arrow">→</div>
+                    <div class="gate">H</div>
+                    <div class="arrow">→</div>
+                    <div class="super"></div>
+                </div>
+            `
+        },
+
+        {
+            title:"Query the Oracle",
+
+            explanation:
+            "The oracle performs a reversible implementation of the hidden function. Information about the function becomes encoded in the quantum state.",
+
+            why:
+            "We need to extract information about the hidden function.",
+
+            example:
+            "Imagine the mystery machine leaving an invisible fingerprint on the quantum state.",
+
+            remember:
+            "The oracle contains the information about the function.",
+
+            visual:`
+                <div class="flow">
+                    <div class="super"></div>
+                    <div class="arrow">→</div>
+                    <div class="gate">Uᶠ</div>
+                </div>
+            `
+        },
+
+        {
+            title:"Create Quantum Interference",
+
+            explanation:
+            "A second set of Hadamard gates causes amplitudes to interfere. Depending on the function, amplitudes combine differently.",
+
+            why:
+            "Interference converts hidden phase information into a measurable pattern.",
+
+            example:
+            "Like waves in water, some waves reinforce each other while others cancel.",
+
+            remember:
+            "Interference reveals information encoded in quantum phases.",
+
+            visual:`
+                <div>
+                    <div style="font-size:80px;color:#55e8ff">
+                        〰 〰
+                    </div>
+                    <div class="arrow">↓</div>
+                    <div style="font-size:28px;color:#ffd35a">
+                        INTERFERENCE
+                    </div>
+                </div>
+            `
+        },
+
+        {
+            title:"Measure the Result",
+
+            explanation:
+            "The final measurement reveals whether the function was constant or balanced, assuming the promised conditions of the problem.",
+
+            why:
+            "The quantum circuit has transformed the global property into a classical result.",
+
+            example:
+            "The mystery machine finally reveals whether all buttons behave the same way or whether they are divided equally.",
+
+            remember:
+            "The idealized Deutsch-Jozsa problem can be solved with one oracle query.",
+
+            visual:`
+                <div class="measurement">
+                    <div class="measure">M</div>
+                    <div class="arrow">→</div>
+                    <div class="state">RESULT</div>
+                </div>
+            `
+        }
+
+    ]
+},
+
+
+/* =========================================================
+   BERNSTEIN VAZIRANI
+========================================================= */
+
+bv:{
+
+    title:"🧩 Bernstein-Vazirani Algorithm",
+
+    subtitle:"Discover a hidden binary string",
+
+    steps:[
+
+        {
+            title:"A Secret String Exists",
+
+            explanation:
+            "Suppose an unknown binary string is hidden inside a black-box function. For example, the secret string could be 1011.",
+
+            why:
+            "Our objective is to discover the complete hidden string.",
+
+            example:
+            "Imagine someone secretly writes a four-digit code such as 1011 and places it inside a machine.",
+
+            remember:
+            "The algorithm discovers a hidden binary string.",
+
+            visual:`
+                <div>
+                    <div class="secret">1011</div>
+                    <p style="color:#8d9ab5;margin-top:20px">
+                        Hidden string
+                    </p>
+                </div>
+            `
+        },
+
+        {
+            title:"Prepare the Quantum State",
+
+            explanation:
+            "Hadamard gates create a superposition of possible input states. An auxiliary qubit is prepared for the oracle operation.",
+
+            why:
+            "Superposition prepares the quantum system so the oracle can encode the hidden string into phases.",
+
+            example:
+            "Instead of testing every possible code separately, the quantum state represents many possibilities together.",
+
+            remember:
+            "Superposition prepares the system for the oracle.",
+
+            visual:`
+                <div class="flow">
+                    <div class="state">0</div>
+                    <div class="arrow">→</div>
+                    <div class="gate">H</div>
+                    <div class="arrow">→</div>
+                    <div class="super"></div>
+                </div>
+            `
+        },
+
+        {
+            title:"Query the Oracle",
+
+            explanation:
+            "The oracle uses the hidden string to encode information into the phase of the quantum state.",
+
+            why:
+            "This is where the unknown secret interacts with the quantum system.",
+
+            example:
+            "Imagine the machine placing an invisible pattern onto the quantum state using the secret code.",
+
+            remember:
+            "The oracle contains the hidden information.",
+
+            visual:`
+                <div class="flow">
+                    <div class="super"></div>
+                    <div class="arrow">→</div>
+                    <div class="gate">U</div>
+                </div>
+            `
+        },
+
+        {
+            title:"Use Interference",
+
+            explanation:
+            "Hadamard gates are applied again. The phase information produced by the oracle is transformed into computational-basis information corresponding to the hidden string.",
+
+            why:
+            "Interference makes the hidden phase pattern observable.",
+
+            example:
+            "An invisible stamp is converted into visible characters so the secret can be read.",
+
+            remember:
+            "Interference converts phase information into the hidden string.",
+
+            visual:`
+                <div>
+                    <div style="font-size:48px;letter-spacing:12px;color:#55e8ff">
+                        1 0 1 1
+                    </div>
+                    <div class="arrow">↑</div>
+                    <div style="color:#ffd35a;font-size:22px">
+                        INTERFERENCE
+                    </div>
+                </div>
+            `
+        },
+
+        {
+            title:"Measure the Hidden String",
+
+            explanation:
+            "The final measurement returns the hidden binary string. Under the idealized Bernstein-Vazirani problem, one oracle query is sufficient.",
+
+            why:
+            "Measurement converts the quantum information into the classical string.",
+
+            example:
+            "We finally open the machine and read the secret code: 1011.",
+
+            remember:
+            "The hidden string can be recovered using one oracle query in the idealized problem.",
+
+            visual:`
+                <div class="measurement">
+                    <div class="measure">M</div>
+                    <div class="arrow">→</div>
+                    <div class="state">1011</div>
+                </div>
+            `
+        }
+
+    ]
+},
+
+
+/* =========================================================
+   QUANTUM TELEPORTATION
+========================================================= */
+
+teleport:{
+
+    title:"📡 Quantum Teleportation",
+
+    subtitle:"Transfer an unknown quantum state using entanglement",
+
+    steps:[
+
+        {
+            title:"Alice Has an Unknown Qubit",
+
+            explanation:
+            "Alice has a qubit in an unknown quantum state represented by |ψ⟩. She wants Bob to end up with the same quantum state.",
+
+            why:
+            "This is the quantum state that needs to be transferred.",
+
+            example:
+            "Imagine Alice has a special quantum object whose exact state is unknown. She wants Bob to obtain that state.",
+
+            remember:
+            "Teleportation starts with an unknown quantum state.",
+
+            visual:`
+                <div>
+                    <div class="qubit">|ψ⟩</div>
+                    <p style="color:#8d9ab5;margin-top:20px">
+                        Alice's qubit
+                    </p>
+                </div>
+            `
+        },
+
+        {
+            title:"Create Entanglement",
+
+            explanation:
+            "Alice and Bob share an entangled pair of qubits. Entanglement creates strong quantum correlations between their systems.",
+
+            why:
+            "Entanglement is the quantum resource that makes teleportation possible.",
+
+            example:
+            "Imagine Alice and Bob have two specially connected quantum objects. Their measurement outcomes are correlated.",
+
+            remember:
+            "Quantum teleportation requires an entangled pair.",
+
+            visual:`
+                <div class="entangled">
+                    <div class="state">A</div>
+                    <div class="entangle-line"></div>
+                    <div class="state">B</div>
+                </div>
+            `
+        },
+
+        {
+            title:"Alice Performs a Bell Measurement",
+
+            explanation:
+            "Alice performs a joint quantum operation and measurement on her unknown qubit and her half of the entangled pair. The result produces two classical bits.",
+
+            why:
+            "These bits tell Bob which correction operation he needs to apply.",
+
+            example:
+            "Alice cannot simply copy the unknown quantum state. Instead, she performs a special measurement that creates instructions for Bob.",
+
+            remember:
+            "Alice's measurement produces two classical bits.",
+
+            visual:`
+                <div class="flow">
+                    <div class="state">|ψ⟩</div>
+                    <div class="arrow">→</div>
+                    <div class="gate">B</div>
+                    <div class="arrow">→</div>
+                    <div class="measure">M</div>
+                </div>
+            `
+        },
+
+        {
+            title:"Send Classical Information",
+
+            explanation:
+            "Alice sends the two classical measurement bits to Bob using an ordinary classical communication channel.",
+
+            why:
+            "Bob needs these bits to determine the correction operation.",
+
+            example:
+            "Alice could send Bob a classical message such as 00, 01, 10 or 11.",
+
+            remember:
+            "Classical communication is required for teleportation.",
+
+            visual:`
+                <div>
+                    <div class="people">
+                        <div>👩</div>
+                        <div class="arrow">→ 01 →</div>
+                        <div>👨</div>
+                    </div>
+                    <p style="color:#8d9ab5;margin-top:20px">
+                        Classical bits
+                    </p>
+                </div>
+            `
+        },
+
+        {
+            title:"Bob Applies the Correction",
+
+            explanation:
+            "Bob uses the two classical bits to determine which correction, such as X and/or Z, should be applied. After the correction, Bob's qubit is in the original state |ψ⟩.",
+
+            why:
+            "The correction reconstructs the original quantum state on Bob's side.",
+
+            example:
+            "The classical message tells Bob which adjustment to make. After the correct adjustment, Bob has the same quantum state Alice started with.",
+
+            remember:
+            "Quantum teleportation transfers the state, not the physical particle itself.",
+
+            visual:`
+                <div class="flow">
+                    <div class="state">B</div>
+                    <div class="arrow">→</div>
+                    <div class="gate">X/Z</div>
+                    <div class="arrow">→</div>
+                    <div class="qubit">|ψ⟩</div>
+                </div>
+            `
+        }
+
+    ]
+}
+
+};
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+let currentAlgorithm="grover";
+let currentStep=0;
+let playing=false;
+let timer=null;
+let voiceEnabled=true;
+
+
+/* =========================================================
+   SELECT ALGORITHM
+========================================================= */
+
+function selectAlgorithm(name){
+
+    stopPlaying();
+
+    currentAlgorithm=name;
+    currentStep=0;
+
+    document
+        .querySelectorAll(".algorithm-card")
+        .forEach(card=>{
+            card.classList.remove("active");
+        });
+
+    document
+        .getElementById("card-"+name)
+        .classList.add("active");
+
+    renderStep();
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function renderStep(){
+
+    const algorithm=algorithms[currentAlgorithm];
+
+    const step=algorithm.steps[currentStep];
+
+
+    document.getElementById("algorithmTitle")
+        .innerText=algorithm.title;
+
+    document.getElementById("algorithmSubtitle")
+        .innerText=algorithm.subtitle;
+
+
+    document.getElementById("stepCounter")
+        .innerText=
+        `Step ${currentStep+1} / ${algorithm.steps.length}`;
+
+
+    document.getElementById("stepTitle")
+        .innerText=step.title;
+
+
+    document.getElementById("stepExplanation")
+        .innerText=step.explanation;
+
+
+    document.getElementById("stepWhy")
+        .innerText=step.why;
+
+
+    document.getElementById("stepExample")
+        .innerText=step.example;
+
+
+    document.getElementById("stepRemember")
+        .innerText=step.remember;
+
+
+    /* VISUAL */
+
+    const visual=
+        document.getElementById("visualContent");
+
+    visual.classList.remove("animate");
+
+    void visual.offsetWidth;
+
+    visual.innerHTML=step.visual;
+
+    visual.classList.add("animate");
+
+
+    document.getElementById("visualStep")
+        .innerText=
+        `Step ${currentStep+1} of ${algorithm.steps.length}`;
+
+
+    document.getElementById("visualCaption")
+        .innerText=step.explanation;
+
+
+    /* PROGRESS */
+
+    const progress=
+        ((currentStep+1)/algorithm.steps.length)*100;
+
+    document.getElementById("progressBar")
+        .style.width=progress+"%";
+
+
+    /* DOTS */
+
+    const dots=
+        document.getElementById("dots");
+
+    dots.innerHTML="";
+
+
+    algorithm.steps.forEach((_,index)=>{
+
+        const dot=
+            document.createElement("div");
+
+        dot.className="dot";
+
+        if(index===currentStep){
+            dot.classList.add("active");
+        }
+
+        dot.onclick=()=>{
+
+            currentStep=index;
+
+            renderStep();
+
+        };
+
+        dots.appendChild(dot);
+
+    });
+
+
+    /* BUTTONS */
+
+    document.getElementById("previousButton")
+        .disabled=currentStep===0;
+
+    document.getElementById("nextButton")
+        .disabled=
+        currentStep===algorithm.steps.length-1;
+
+
+    /* VOICE */
+
+    if(voiceEnabled){
+
+        setTimeout(()=>{
+            speakCurrentStep();
+        },400);
+
+    }
+
+}
+
+
+/* =========================================================
+   NEXT
+========================================================= */
+
+function nextStep(){
+
+    const algorithm=
+        algorithms[currentAlgorithm];
+
+    if(
+        currentStep <
+        algorithm.steps.length-1
+    ){
+
+        currentStep++;
+
+        renderStep();
+
+    }
+    else{
+
+        stopPlaying();
+
+        speak(
+            "Excellent. You have completed this quantum algorithm."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   PREVIOUS
+========================================================= */
+
+function previousStep(){
+
+    if(currentStep>0){
+
+        currentStep--;
+
+        renderStep();
+
+    }
+
+}
+
+
+/* =========================================================
+   REPLAY
+========================================================= */
+
+function restartAlgorithm(){
+
+    stopPlaying();
+
+    currentStep=0;
+
+    renderStep();
+
+}
+
+
+/* =========================================================
+   PLAY
+========================================================= */
+
+function togglePlay(){
+
+    if(playing){
+
+        stopPlaying();
+
+    }
+    else{
+
+        startPlaying();
+
+    }
+
+}
+
+
+function startPlaying(){
+
+    playing=true;
+
+    document.getElementById("playButton")
+        .innerText="⏸ Pause Steps";
+
+
+    timer=setInterval(()=>{
+
+        const algorithm=
+            algorithms[currentAlgorithm];
+
+
+        if(
+            currentStep <
+            algorithm.steps.length-1
+        ){
+
+            currentStep++;
+
+            renderStep();
+
+        }
+        else{
+
+            stopPlaying();
+
+        }
+
+    },7000);
+
+}
+
+
+function stopPlaying(){
+
+    playing=false;
+
+    clearInterval(timer);
+
+    timer=null;
+
+    document.getElementById("playButton")
+        .innerText="▶ Play Steps";
+
+}
+
+
+/* =========================================================
+   VOICE
+========================================================= */
+
+function speak(text){
+
+    if(
+        !voiceEnabled ||
+        !("speechSynthesis" in window)
+    ){
+
+        return;
+
+    }
+
+    speechSynthesis.cancel();
+
+    const speech=
+        new SpeechSynthesisUtterance(text);
+
+    speech.rate=.82;
+
+    speech.pitch=1;
+
+    speech.volume=1;
+
+    speechSynthesis.speak(speech);
+
+}
+
+
+function speakCurrentStep(){
+
+    const algorithm=
+        algorithms[currentAlgorithm];
+
+    const step=
+        algorithm.steps[currentStep];
+
+
+    speak(
+
+        `Step ${currentStep+1}.
+        ${step.title}.
+
+        What is happening?
+        ${step.explanation}.
+
+        Why are we doing this?
+        ${step.why}.
+
+        Simple example.
+        ${step.example}.
+
+        Remember.
+        ${step.remember}.`
+
+    );
+
+}
+
+
+function stopVoice(){
+
+    if("speechSynthesis" in window){
+
+        speechSynthesis.cancel();
+
+    }
+
+}
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener("keydown",event=>{
+
+    if(event.key==="ArrowRight"){
+
+        nextStep();
+
+    }
+
+    if(event.key==="ArrowLeft"){
+
+        previousStep();
+
+    }
+
+    if(event.code==="Space"){
+
+        event.preventDefault();
+
+        togglePlay();
+
+    }
+
+});
+
+
+/* =========================================================
+   INITIAL LOAD
+========================================================= */
+
+renderStep();
+
+</script>
+
+</body>
+</html>

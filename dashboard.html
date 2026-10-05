@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q-Learn AI | Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            overflow-x: hidden;
+            background: 
+                radial-gradient(circle at center, rgba(0, 150, 255, 0.2), transparent 40%),
+                linear-gradient(135deg, #020b1c, #03152d, #020b1c);
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* CIRCUIT GRID BACKGROUND */
+        .background {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 120, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 120, 255, 0.08) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: -3;
+        }
+
+        /* HEADER NAVIGATION */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background: rgba(3, 28, 48, 0.6);
+            border-bottom: 1px solid rgba(0, 217, 255, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #d9fbff;
+            text-shadow: 0 0 10px #00eaff;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            color: #8dddec;
+        }
+
+        .logout-btn {
+            padding: 8px 18px;
+            background: rgba(0, 190, 255, 0.2);
+            border: 1px solid #00eaff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(0, 220, 255, 0.4);
+            box-shadow: 0 0 10px #00eaff;
+        }
+
+        /* DASHBOARD MAIN CONTENT */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            z-index: 5;
+        }
+
+        .dashboard-title {
+            font-size: 32px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            color: #d9fbff;
+            text-shadow: 0 0 10px #00eaff;
+            text-align: center;
+        }
+
+        .dashboard-subtitle {
+            font-size: 14px;
+            color: #8dddec;
+            margin-bottom: 45px;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        /* FOUR BOXES GRID */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .card {
+            background: rgba(3, 28, 48, 0.8);
+            border: 2px solid rgba(0, 217, 255, 0.4);
+            border-radius: 18px;
+            padding: 35px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 183, 255, 0.2), inset 0 0 15px rgba(0, 183, 255, 0.05);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 234, 255, 0.1), transparent);
+            transition: 0.5s;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            border-color: #00eaff;
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px #00eaff, 0 0 50px rgba(0, 140, 255, 0.4), inset 0 0 20px rgba(0, 234, 255, 0.2);
+        }
+
+        .card-icon {
+            font-size: 38px;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #ffffff;
+            margin-bottom: 8px;
+            text-shadow: 0 0 6px rgba(0, 234, 255, 0.5);
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: #8dddec;
+            line-height: 1.4;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
+            header {
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background"></div>
+
+    <header>
+        <div class="logo">Q-LEARN AI</div>
+        <div class="user-profile">
+            <span class="user-name">Welcome, Quantum Scholar</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <main>
+        <h1 class="dashboard-title">QUANTUM DASHBOARD</h1>
+        <p class="dashboard-subtitle">Select a module to accelerate your learning journey</p>
+
+        <div class="grid-container">
+            <div class="card" onclick="navigateTo('ai-notes')">
+                <div class="card-icon">📚</div>
+                <div class="card-title">1. AI Notes</div>
+                <div class="card-desc">Generate smart, summarized explanations and study notes tailored to your quantum curriculum.</div>
+            </div>
+
+            <div class="card" onclick="navigateTo('visualizer')">
+                <div class="card-icon">⚛️</div>
+                <div class="card-title">2. Visualizer</div>
+                <div class="card-desc">Interact with 3D quantum circuits, gate operations, and probability wave states in real time.</div>
+            </div>
+
+            <div class="card" onclick="navigateTo('quiz')">
+                <div class="card-icon">📝</div>
+                <div class="card-title">3. Quiz</div>
+                <div class="card-desc">Test your comprehension with AI-generated adaptive quizzes and instant performance feedback.</div>
+            </div>
+
+            <div class="card" onclick="navigateTo('ai-chatbot')">
+                <div class="card-icon">🤖</div>
+                <div class="card-title">4. AI Chatbot</div>
+                <div class="card-desc">Chat with your intelligent quantum assistant to resolve doubts, debug circuits, and learn concepts instantly.</div>
+            </div>
+        </div>
+       
+
+    </main>
+
+    <script>
+    function navigateTo(module) {
+        if (module === 'ai-notes') {
+            window.location.href = "ainotes.html";
+        } else if (module === 'visualizer') {
+            // This line connects the Visualizer button to visualizer.html
+            window.location.href = "visualizer.html"; 
+        } else if (module === 'quiz') {
+            window.location.href = "quiz.html";
+        } else if (module === 'ai-chatbot') {
+            window.location.href = "chatboot.html";
+        } else {
+            alert("Redirecting to " + module.toUpperCase() + " module...");
+        }
+    }
+
+    function logout() {
+        alert("Logged out successfully!");
+        window.location.href = "login.html";
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Q-Learn AI | Login</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            overflow: hidden;
+
+            /* Dark quantum background */
+            background:
+                radial-gradient(circle at center,
+                    rgba(0, 150, 255, 0.25),
+                    transparent 35%),
+                linear-gradient(
+                    90deg,
+                    #020b1c,
+                    #03152d,
+                    #020b1c
+                );
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            color: white;
+        }
+
+
+        /* =========================================
+            CIRCUIT GRID BACKGROUND
+        ========================================= */
+
+        .background {
+            position: fixed;
+            inset: 0;
+
+            background-image:
+                linear-gradient(
+                    rgba(0, 120, 255, 0.12) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(0, 120, 255, 0.12) 1px,
+                    transparent 1px
+                );
+
+            background-size: 25px 25px;
+
+            z-index: -3;
+        }
+
+
+        /* =========================================
+            GLOWING PARTICLES
+        ========================================= */
+
+        .particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        .particle {
+            position: absolute;
+
+            width: 5px;
+            height: 5px;
+
+            background: #00eaff;
+
+            box-shadow:
+                0 0 8px #00eaff,
+                0 0 18px #008cff;
+
+            animation: blink 2s infinite alternate;
+        }
+
+        .p1 { left: 18%; top: 35%; }
+        .p2 { left: 25%; top: 42%; animation-delay: .4s; }
+        .p3 { left: 31%; top: 31%; animation-delay: .8s; }
+        .p4 { left: 68%; top: 36%; animation-delay: .2s; }
+        .p5 { left: 74%; top: 44%; animation-delay: .7s; }
+        .p6 { left: 82%; top: 34%; animation-delay: 1s; }
+        .p7 { left: 21%; top: 63%; animation-delay: .5s; }
+        .p8 { left: 76%; top: 65%; animation-delay: .9s; }
+        .p9 { left: 34%; top: 70%; animation-delay: .3s; }
+        .p10 { left: 66%; top: 68%; animation-delay: .6s; }
+
+        @keyframes blink {
+
+            from {
+                opacity: .25;
+            }
+
+            to {
+                opacity: 1;
+            }
+
+        }
+
+
+        /* =========================================
+            CIRCUIT LINES
+        ========================================= */
+
+        .circuit {
+            position: absolute;
+
+            width: 100%;
+            height: 100%;
+
+            pointer-events: none;
+        }
+
+        .line {
+            position: absolute;
+
+            height: 3px;
+
+            background: #00eaff;
+
+            box-shadow:
+                0 0 6px #00eaff,
+                0 0 18px #008cff,
+                0 0 35px #0066ff;
+        }
+
+        .line::after {
+            content: "";
+
+            position: absolute;
+
+            width: 9px;
+            height: 9px;
+
+            border-radius: 50%;
+
+            background: #ffffff;
+
+            box-shadow:
+                0 0 8px #00eaff,
+                0 0 20px #008cff;
+
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+
+        /* LEFT TOP */
+
+        .lt1 {
+            width: 130px;
+            left: 12%;
+            top: 26%;
+        }
+
+        .lt1::after {
+            right: -5px;
+        }
+
+
+        .lt2 {
+            width: 80px;
+            left: 21%;
+            top: 31%;
+            transform: rotate(40deg);
+        }
+
+
+        .lt3 {
+            width: 110px;
+            left: 24%;
+            top: 36%;
+        }
+
+
+        /* RIGHT TOP */
+
+        .rt1 {
+            width: 130px;
+            right: 12%;
+            top: 26%;
+        }
+
+        .rt1::after {
+            left: -5px;
+        }
+
+
+        .rt2 {
+            width: 80px;
+            right: 21%;
+            top: 31%;
+            transform: rotate(-40deg);
+        }
+
+
+        .rt3 {
+            width: 110px;
+            right: 24%;
+            top: 36%;
+        }
+
+
+        /* LEFT BOTTOM */
+
+        .lb1 {
+            width: 130px;
+            left: 12%;
+            top: 74%;
+        }
+
+        .lb1::after {
+            right: -5px;
+        }
+
+
+        .lb2 {
+            width: 80px;
+            left: 21%;
+            top: 69%;
+            transform: rotate(-40deg);
+        }
+
+
+        .lb3 {
+            width: 110px;
+            left: 24%;
+            top: 64%;
+        }
+
+
+        /* RIGHT BOTTOM */
+
+        .rb1 {
+            width: 130px;
+            right: 12%;
+            top: 74%;
+        }
+
+        .rb1::after {
+            left: -5px;
+        }
+
+
+        .rb2 {
+            width: 80px;
+            right: 21%;
+            top: 69%;
+            transform: rotate(40deg);
+        }
+
+
+        .rb3 {
+            width: 110px;
+            right: 24%;
+            top: 64%;
+        }
+
+
+        /* =========================================
+            LOGIN BOX
+        ========================================= */
+
+        .login-box {
+
+            position: relative;
+
+            width: 390px;
+
+            padding: 45px 42px;
+
+            background:
+                rgba(3, 28, 48, 0.88);
+
+            border: 2px solid #00d9ff;
+
+            border-radius: 25px;
+
+            box-shadow:
+                0 0 10px #00d9ff,
+                0 0 30px rgba(0, 183, 255, .8),
+                0 0 70px rgba(0, 89, 255, .45),
+                inset 0 0 25px rgba(0, 183, 255, .15);
+
+            backdrop-filter: blur(12px);
+
+            z-index: 5;
+
+            animation: boxGlow 3s infinite alternate;
+        }
+
+
+        @keyframes boxGlow {
+
+            from {
+                box-shadow:
+                    0 0 10px #00d9ff,
+                    0 0 25px rgba(0,183,255,.6),
+                    0 0 50px rgba(0,89,255,.3);
+            }
+
+            to {
+                box-shadow:
+                    0 0 15px #00eaff,
+                    0 0 40px rgba(0,183,255,.9),
+                    0 0 80px rgba(0,89,255,.5);
+            }
+
+        }
+
+
+        /* =========================================
+            CORNER DECORATIONS
+        ========================================= */
+
+        .login-box::before,
+        .login-box::after {
+
+            content: "";
+
+            position: absolute;
+
+            width: 60px;
+            height: 25px;
+
+            border-top: 3px solid #00eaff;
+
+        }
+
+
+        .login-box::before {
+
+            top: 25px;
+            left: 25px;
+
+            border-left: 3px solid #00eaff;
+
+        }
+
+
+        .login-box::after {
+
+            bottom: 25px;
+            right: 25px;
+
+            border-right: 3px solid #00eaff;
+            border-bottom: 3px solid #00eaff;
+
+        }
+
+
+        /* =========================================
+            TITLE
+        ========================================= */
+
+        .title {
+
+            text-align: center;
+
+            font-size: 31px;
+
+            letter-spacing: 2px;
+
+            margin-bottom: 8px;
+
+            color: #d9fbff;
+
+            text-shadow:
+                0 0 8px #00eaff,
+                0 0 20px rgba(0,234,255,.6);
+        }
+
+
+        .subtitle {
+
+            text-align: center;
+
+            font-size: 12px;
+
+            color: #8dddec;
+
+            margin-bottom: 32px;
+
+            letter-spacing: 1px;
+        }
+
+
+        /* =========================================
+            INPUT
+        ========================================= */
+
+        .input-group {
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .input-group label {
+
+            display: block;
+
+            font-size: 13px;
+
+            color: #9debf5;
+
+            margin-bottom: 8px;
+
+        }
+
+
+        .input-wrapper {
+
+            position: relative;
+
+        }
+
+
+        .input-wrapper .icon-left {
+
+            position: absolute;
+
+            left: 14px;
+
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            font-size: 17px;
+
+            color: #7eeaff;
+
+        }
+
+
+        .input-wrapper input {
+
+            width: 100%;
+
+            padding: 14px 45px;
+
+            background:
+                rgba(0, 128, 190, .22);
+
+            border: 1px solid rgba(0, 225, 255, .45);
+
+            color: white;
+
+            outline: none;
+
+            border-radius: 2px;
+
+            font-size: 14px;
+
+            transition: .3s;
+
+        }
+
+
+        .input-wrapper input::placeholder {
+
+            color: #65a8b8;
+
+        }
+
+
+        .input-wrapper input:focus {
+
+            border-color: #00eaff;
+
+            background:
+                rgba(0, 183, 255, .25);
+
+            box-shadow:
+                0 0 10px rgba(0,234,255,.45),
+                inset 0 0 10px rgba(0,234,255,.1);
+        }
+
+
+        /* Toggle Password Eye Icon Styling */
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #7eeaff;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: .2s;
+        }
+
+        .toggle-password:hover {
+            color: #00eaff;
+            text-shadow: 0 0 6px #00eaff;
+        }
+
+
+        /* =========================================
+            OPTIONS
+        ========================================= */
+
+        .options {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin: 5px 0 25px;
+
+            font-size: 12px;
+
+            color: #8dcbd5;
+
+        }
+
+
+        .remember {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+        }
+
+
+        .remember input {
+
+            accent-color: #00d9ff;
+
+        }
+
+
+        .forgot {
+
+            color: #00eaff;
+
+            text-decoration: none;
+
+        }
+
+
+        .forgot:hover {
+
+            text-shadow:
+                0 0 8px #00eaff;
+
+        }
+
+
+        /* =========================================
+            LOGIN BUTTON
+        ========================================= */
+
+        .login-btn {
+
+            width: 100%;
+
+            padding: 14px;
+
+            border: 1px solid #00eaff;
+
+            border-radius: 3px;
+
+            background:
+                rgba(0, 190, 255, .25);
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            letter-spacing: 2px;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 0 10px rgba(0,234,255,.5);
+
+            transition: .3s;
+
+        }
+
+
+        .login-btn:hover {
+
+            background:
+                rgba(0, 220, 255, .45);
+
+            box-shadow:
+                0 0 10px #00eaff,
+                0 0 30px rgba(0,234,255,.7);
+
+            transform: translateY(-2px);
+
+        }
+
+
+        /* =========================================
+            SIGN UP
+        ========================================= */
+
+        .signup {
+
+            text-align: center;
+
+            margin-top: 22px;
+
+            font-size: 13px;
+
+            color: #78aeba;
+
+        }
+
+
+        .signup a {
+
+            color: #00eaff;
+
+            text-decoration: none;
+
+            font-weight: bold;
+
+        }
+
+
+        .signup a:hover {
+
+            text-shadow:
+                0 0 8px #00eaff;
+
+        }
+
+
+        /* =========================================
+            RESPONSIVE
+        ========================================= */
+
+        @media(max-width: 600px) {
+
+            .login-box {
+
+                width: 90%;
+
+                padding: 35px 25px;
+
+            }
+
+            .lt1,
+            .lt2,
+            .lt3,
+            .rt1,
+            .rt2,
+            .rt3,
+            .lb1,
+            .lb2,
+            .lb3,
+            .rb1,
+            .rb2,
+            .rb3 {
+
+                display: none;
+
+            }
+
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+<div class="background"></div>
+
+
+<div class="particles">
+
+    <div class="particle p1"></div>
+    <div class="particle p2"></div>
+    <div class="particle p3"></div>
+    <div class="particle p4"></div>
+    <div class="particle p5"></div>
+    <div class="particle p6"></div>
+    <div class="particle p7"></div>
+    <div class="particle p8"></div>
+    <div class="particle p9"></div>
+    <div class="particle p10"></div>
+
+</div>
+
+
+<div class="circuit">
+
+    <div class="line lt1"></div>
+    <div class="line lt2"></div>
+    <div class="line lt3"></div>
+
+    <div class="line rt1"></div>
+    <div class="line rt2"></div>
+    <div class="line rt3"></div>
+
+    <div class="line lb1"></div>
+    <div class="line lb2"></div>
+    <div class="line lb3"></div>
+
+    <div class="line rb1"></div>
+    <div class="line rb2"></div>
+    <div class="line rb3"></div>
+
+</div>
+
+
+<div class="login-box">
+
+    <h1 class="title">
+        LOGIN
+    </h1>
+
+
+    <p class="subtitle">
+        QUANTUM LEARNING SYSTEM
+    </p>
+
+
+    <div class="input-group">
+
+        <label>
+            EMAIL ADDRESS
+        </label>
+
+        <div class="input-wrapper">
+
+            <span class="icon-left">✉</span>
+
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+            >
+
+        </div>
+
+    </div>
+
+
+    <div class="input-group">
+
+        <label>
+            PASSWORD
+        </label>
+
+        <div class="input-wrapper">
+
+            <span class="icon-left">🔒</span>
+
+            <input
+                type="password"
+                id="password"
+                placeholder="Enter your password"
+            >
+
+            <button type="button" class="toggle-password" id="togglePassword" onclick="togglePasswordVisibility()">
+                👁️
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="options">
+
+        <label class="remember">
+
+            <input
+                type="checkbox"
+            >
+
+            Remember me
+
+        </label>
+
+
+        <a href="#" class="forgot">
+            Forgot Password?
+        </a>
+
+    </div>
+
+
+    <button
+        class="login-btn"
+        onclick="loginUser()">
+
+        SIGN IN
+
+    </button>
+
+
+    <div class="signup">
+
+        Don't have an account?
+
+        <a href="#">
+            Create Account
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById("password");
+    const toggleBtn = document.getElementById("togglePassword");
+
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        toggleBtn.textContent = "👁️‍🗨️"; // Optional: change symbol to indicate visible state
+    } else {
+        passwordInput.type = "password";
+        toggleBtn.textContent = "👁️";
+    }
+}
+
+function loginUser() {
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    const password =
+        document.getElementById("password").value.trim();
+
+
+    if (email === "") {
+
+        alert("Please enter your email.");
+
+        return;
+    }
+
+
+    if (password === "") {
+
+        alert("Please enter your password.");
+
+        return;
+    }
+
+
+    if (!email.includes("@")) {
+
+        alert("Please enter a valid email.");
+
+        return;
+    }
+
+
+    /*
+        FRONTEND DEMO
+
+        Later connect this to:
+
+        POST /api/login
+
+        Your FastAPI backend will
+        authenticate the user.
+    */
+
+
+    alert("LOGIN SUCCESSFUL!");
+
+    // Change this to your dashboard page
+    window.location.href = "dashboard.html";
+
+}
+
+</script>
+
+
+</body>
+</html>
